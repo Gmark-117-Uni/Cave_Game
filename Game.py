@@ -5,7 +5,7 @@ from OptionsMenu import OptionsMenu
 from SimulationMenu import SimulationMenu
 from CreditsMenu import CreditsMenu
 from MapGenerator import MapGenerator
-from DroneManager import DroneManager
+from MissionControl import MissionControl
 
 class Game():
     def __init__(self): 
@@ -25,7 +25,7 @@ class Game():
         
         # Initialise game window
         self.display = pygame.Surface((self.width,self.height))
-        self.window  = pygame.display.set_mode((self.width,self.height), pygame.RESIZABLE)
+        self.window  = pygame.display.set_mode((self.width,self.height))
 
         # Set window title
         pygame.display.set_caption('Cave Game')
@@ -44,13 +44,14 @@ class Game():
     # Game loop function
     def game_loop(self):
         if self.playing:
-            self.run_map_generator()
-            self.control_tower = DroneManager(self, 3)
-    
-    # Create the cave
-    def run_map_generator(self):
-        self.sim_settings  = self.simulation.get_sim_settings()
-        self.cave = MapGenerator(self)
+            # Settings : [Map Dimension, Seed, Drone Number]
+            self.sim_settings  = self.simulation.get_sim_settings()
+            
+            # Generate the map
+            self.cave_gen = MapGenerator(self)
+
+            # Prep and Start the mission
+            #self.mission_control = MissionControl(self)
 
    # Check player inputs
     def check_events(self):

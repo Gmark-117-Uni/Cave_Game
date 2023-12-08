@@ -11,10 +11,10 @@ class MapGenerator():
         self.game        = game
         self.settings    = game.sim_settings
         self.surface     = game.display
-        self.width       = game.width
-        self.height      = game.height
-        self.border_thck = 10
-        self.bin_map     = np.ones([Assets.DISPLAY_H,Assets.DISPLAY_W])
+        self.width       = Assets.FULLSCREEN_W
+        self.height      = Assets.FULLSCREEN_H
+        self.border_thck = 50
+        self.bin_map     = np.ones([self.height,self.width])
         self.worm_inputs = Assets.WormInputs[self.settings[0]].value
         
         # Set the seed
@@ -126,7 +126,11 @@ class MapGenerator():
         return cleaned_image
 
     # Dispaly the map in the window
-    def draw_map(self, input_map, x1=0, x2=Assets.DISPLAY_W-1, y1=0, y2=Assets.DISPLAY_H-1):
+    def draw_map(self, input_map, x1=0, x2=Assets.FULLSCREEN_W-1, y1=0, y2=Assets.FULLSCREEN_H-1):
+        # Resize pygame window
+        self.game.display = pygame.Surface((self.width,self.height))
+        self.game.window = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+
         # Make the background black
         self.surface.fill(Assets.Colors['BLACK'].value)
 

@@ -39,7 +39,7 @@ class MapGenerator():
                                      rand.randint(10,740),      # Random
                                      rand.randint(10,740)]))    # Random
 
-        # Initialise 8 worms simultaneously
+        # Initialise worm management settings
         self.proc_num     = 8
         self.targets      = list(map(int, np.linspace(0,self.proc_num-1,self.proc_num)))
         self.proc_counter = 0
@@ -362,7 +362,7 @@ class MapGenerator():
         target_dir = int(deg_dir - 90 if deg_dir>=90 else deg_dir + 270)
 
         # Randomically change direction to maintain realism
-        if rand.randint(0,3)!=0:
+        if not rand.randint(0,1):
             target_dir = (target_dir + rand.randint(-90,90)) % 360
 
         # Check if direction is valid because I don't trust myself

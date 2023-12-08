@@ -20,7 +20,6 @@ class Drone():
         
     def set_drone_initial_point(self):
         good_point = False
-
         while not good_point:
             
             # Take one of the initial points of the worms as initial point for the drone
@@ -30,7 +29,7 @@ class Drone():
             # Check if the point is white or black
             if self.cave.bin_map[self.initial_point[1]][self.initial_point[0]] == 0:  # White
                 good_point = True
-
-    def run(self):
-        # Create n dot in the good position
+    
+    # Draw the drone on the map
+    def draw_drone(self, pos):
         pass

@@ -5,7 +5,7 @@ from OptionsMenu import OptionsMenu
 from SimulationMenu import SimulationMenu
 from CreditsMenu import CreditsMenu
 from MapGenerator import MapGenerator
-from Drone import Drone
+from DroneManager import DroneManager
 
 class Game():
     def __init__(self): 
@@ -45,12 +45,12 @@ class Game():
     def game_loop(self):
         if self.playing:
             self.run_map_generator()
-            self.drones = Drone(self, 3)
+            self.control_tower = DroneManager(self, 3)
     
     # Create the cave
     def run_map_generator(self):
-        settings  = self.simulation.get_sim_settings()
-        self.cave = MapGenerator(self, settings)
+        self.sim_settings  = self.simulation.get_sim_settings()
+        self.cave = MapGenerator(self)
 
    # Check player inputs
     def check_events(self):

@@ -11,18 +11,17 @@ class SimulationMenu(Menu):
 
         # Get the list of states for this menu and set the current one
         self.states = Assets.sim_menu_states    # ['Mode', 'Map Dimension', 'Seed',
-                                                #  'Prefab Map', 'Back', 'Start Simulation']
+                                                #  'Drones', 'Back', 'Start Simulation']
         self.default_state = len(self.states) - 1
         self.state  = self.states[self.default_state]
 
         # Initialise the possible options and their iterators
         self.mode_options   = Assets.mode_options
         self.map_options    = Assets.map_options
-        self.prefab_options = Assets.prefab_options
 
-        self.mode    = 0
-        self.map_dim = 0
-        self.prefab  = 0
+        self.mode     = 0
+        self.map_dim  = 0
+        self.n_drones = 2
        
         # Define positions for menu text
         self.align_left      = self.mid_w - 50
@@ -34,7 +33,7 @@ class SimulationMenu(Menu):
         self.states_y = [self.mid_h -  90,  # Mode
                          self.mid_h -  50,  # Map Dimension
                          self.mid_h -  10,  # Seed
-                         self.mid_h +  30,  # Prefab Map
+                         self.mid_h +  30,  # Drones
                          self.mid_h +  70,  # Back
                          self.mid_h + 170]  # Start Simulation
         
@@ -44,13 +43,13 @@ class SimulationMenu(Menu):
         self.cursor_x = [self.align_left - 110 + self.cursor_offset,  # Mode
                          self.align_left - 310 + self.cursor_offset,  # Map Dimension
                          self.align_left -  95 + self.cursor_offset,  # Seed
-                         self.align_left - 245 + self.cursor_offset,  # Prefab Map
+                         self.align_left - 145 + self.cursor_offset,  # Drones
                          self.mid_w      -  45 + self.cursor_offset,  # Back
                          -100]                                        # Start Simulation
         self.cursor_y = [self.states_y[0],  # Mode
                          self.states_y[1],  # Map Dimension
                          self.states_y[2],  # Seed
-                         self.states_y[3],  # Prefab Map
+                         self.states_y[3],  # Drones
                          self.states_y[4],  # Back
                          -100]              # Start Simulation
         
@@ -109,7 +108,7 @@ class SimulationMenu(Menu):
                            Assets.Fonts['SMALL'].value,
                            Assets.Colors['WHITE'].value,
                            Assets.RectHandle['MIDRIGHT'].value)
-            self.draw_text('Prefab Map', 25,
+            self.draw_text('Drones', 25,
                            self.states_x[3],
                            self.states_y[3],
                            Assets.Fonts['SMALL'].value,
@@ -143,7 +142,7 @@ class SimulationMenu(Menu):
                            Assets.Fonts['SMALL'].value,
                            Assets.Colors['GREENDARK'].value,
                            Assets.RectHandle['MIDLEFT'].value)
-            if len(self.seed_input)==0 and self.prefab==0 and (time.time() % 1)>=0.5:
+            if len(self.seed_input)==0 and (time.time() % 1)>=0.5:
                 self.draw_text('Enter Seed', 25,
                                self.align_right,
                                self.states_y[2],
@@ -151,13 +150,13 @@ class SimulationMenu(Menu):
                                Assets.Colors['RED'].value,
                                Assets.RectHandle['MIDLEFT'].value)
             else:
-                self.draw_text(f'{self.seed_input}' if self.prefab==0 else '45', 25,
+                self.draw_text(f'{self.seed_input}', 25,
                                self.align_right,
                                self.states_y[2],
                                Assets.Fonts['SMALL'].value,
                                Assets.Colors['GREENDARK'].value,
                                Assets.RectHandle['MIDLEFT'].value)
-            self.draw_text(f'{self.prefab_options[self.prefab]}', 25,
+            self.draw_text(f'{self.n_drones}', 25,
                            self.align_right,
                            self.states_y[3],
                            Assets.Fonts['SMALL'].value,
@@ -183,9 +182,8 @@ class SimulationMenu(Menu):
 
     # Draw the input cursor for the Seed option
     def draw_input_cursor(self):
-        # If the player is not using a prefabricated map
-        # and is currently on the Seed option ...
-        if self.state == 'Seed' and self.prefab == 0:
+        # If the player is currently on the Seed option ...
+        if self.state == 'Seed':
             # ... Draw a cursor line to indicate the input field
             pygame.draw.line(self.game.display,
                              Assets.Colors['GREENDARK'].value,
@@ -236,15 +234,12 @@ class SimulationMenu(Menu):
                         case 1: self.map_dim = 2
                         case 2: self.map_dim = 0
                     return
-                case 'Prefab Map':
-                    match self.prefab:
-                        case 0:
-                            self.prefab = 1
-                            self.seed_input = "45"
-                        case 1:
-                            self.prefab = 0 
-                            self.seed_input = ""
-                            self.reset_input_cursor()
+                case 'Drones':
+                    match self.n_drones:
+                        case 8:
+                            self.n_drones = 2
+                        case _:
+                            self.n_drones += 1
                     return
         
         # Handle seed input
@@ -289,7 +284,7 @@ class SimulationMenu(Menu):
             'Mode': self.mode_options[self.mode],
             'Map_dimension': self.map_options[self.map_dim],
             'Seed': self.seed_input,
-            'Prefab_Map': self.prefab_options[self.prefab]
+            'Drones': self.n_drones
         }
 
         # Create or overwrite the file
@@ -299,17 +294,12 @@ class SimulationMenu(Menu):
     # Return the chosen map dimension
     def get_sim_settings(self):
         match self.map_dim:
-            case 0: return ['SMALL',
-                            int(self.seed_input),
-                            ]
-            case 1: return ['MEDIUM',
-                            int(self.seed_input),
-                            ]
-            case 2: return ['BIG',
-                            int(self.seed_input),
-                            ]
-    
-    # Bring back the input cursor when the seed is deleted
-    def reset_input_cursor(self):
-        self.input_cursor_x = self.align_right + self.input_cursor_offset*len(self.seed_input)
-        self.input_cursor_y = self.states_y[2] + 15
+            case 0: map_dim = 'SMALL'
+            case 1: map_dim = 'MEDIUM'
+            case 2: map_dim = 'BIG'
+        
+        settings = [map_dim,
+                    int(self.seed_input),
+                    self.n_drones]
+        
+        return settings

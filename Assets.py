@@ -11,10 +11,9 @@ DISPLAY_H = 750
 # Lists for menu voices and settings
 main_menu_states    = ['Start', 'Options', 'Credits', 'Exit']
 options_menu_states = ['Game Volume', 'Music Volume', 'Button Sound', 'Back']
-sim_menu_states     = ['Mode', 'Map Dimension', 'Seed', 'Prefab Map', 'Back', 'Start Simulation']
+sim_menu_states     = ['Mode', 'Map Dimension', 'Seed', 'Drones', 'Back', 'Start Simulation']
 mode_options        = ["Cave exploration", "Rescue mission"]
 map_options         = ["Small", "Medium", "Big"]
-prefab_options      = ["No", "Yes"]
 
 # Map Generator Inputs
 step = 10
@@ -39,10 +38,10 @@ class Audio(Enum):
         BUTTON     = os.path.join(CURRENT_DIR, 'Assets', 'Audio', 'Button.wav')
 
 class Backgrounds(Enum):
-        CAVE       = os.path.join(CURRENT_DIR, 'Assets', 'Background', 'cave.jpg')
-        DARK_CAVE  = os.path.join(CURRENT_DIR, 'Assets', 'Background', 'cave_black.jpg')
-        DRONE      = os.path.join(CURRENT_DIR, 'Assets', 'Background', 'drone.png')
-        DRONE_BG   = os.path.join(CURRENT_DIR, 'Assets', 'Background', 'drone_BG.jpg')
+        CAVE       = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'cave.jpg')
+        DARK_CAVE  = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'cave_black.jpg')
+        DRONE      = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone.png')
+        DRONE_BG   = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone_BG.jpg')
 
 class RectHandle(Enum):
         CENTER     = 'Center'

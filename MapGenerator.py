@@ -7,9 +7,9 @@ import cv2
 import Assets
 
 class MapGenerator():
-    def __init__(self, game, settings):
+    def __init__(self, game):
         self.game        = game
-        self.settings    = settings
+        self.settings    = game.sim_settings
         self.surface     = game.display
         self.width       = game.width
         self.height      = game.height
@@ -88,7 +88,7 @@ class MapGenerator():
         self.game.curr_menu.blit_loading('Growing stalactites...')
 
         # Define the kernel dimensions and prep the map matrix
-        kernel_dim = Assets.WormInputs[self.settings[0]].value[1] - 1
+        kernel_dim = self.worm_inputs[1] - 1
         input_map  = self.bin_map.astype("uint8")
         
         # Apply a median blur filter to smooth borders 

@@ -19,11 +19,12 @@ options_menu_states = ['Game Volume', 'Music Volume', 'Button Sound', 'Back']
 sim_menu_states     = ['Mode', 'Map Dimension', 'Seed', 'Drones', 'Back', 'Start Simulation']
 mode_options        = ["Cave exploration", "Rescue mission"]
 map_options         = ["Small", "Medium", "Big"]
+seed                = [     6,       19,    837]
 
 # Map Generator Inputs
 step = 10
 strength = 16
-life = 50
+life = 75
 
 class Colors(Enum):
         BLACK      = (0, 0, 0)

@@ -56,14 +56,11 @@ class SimulationMenu(Menu):
         self.cursor_pos = [self.cursor_x[self.default_state],
                            self.cursor_y[self.default_state]]
 
-        # Set the seed input
-        self.seed_input = ''
-
-        # Set the seed input cursor positions
+        # Set the seed input cursor position
         self.input_cursor_offset = 25
 
-        self.input_cursor_x = self.align_right + self.input_cursor_offset*len(self.seed_input)
-        self.input_cursor_y = self.states_y[2] + 15
+        # Set the seed input
+        self.set_seed_input()
 
         # Initialize the number input flag
         self.number_input = False  
@@ -233,7 +230,12 @@ class SimulationMenu(Menu):
                         case 0: self.map_dim = 1
                         case 1: self.map_dim = 2
                         case 2: self.map_dim = 0
+                    self.set_seed_input()
+                    self.game.blit_screen()
                     return
+                case 'Seed':
+                    if len(self.seed_input)>0:
+                        self.state = self.states[-1]
                 case 'Drones':
                     match self.n_drones:
                         case 8:
@@ -303,3 +305,17 @@ class SimulationMenu(Menu):
                     self.n_drones]
         
         return settings
+
+    # Set the seed
+    def set_seed_input(self):
+        match self.map_dim:
+            case 0: self.seed_input = str(Assets.seed[0])
+            case 1: self.seed_input = str(Assets.seed[1])
+            case 2: self.seed_input = str(Assets.seed[2])
+        
+        self.set_input_cursor_pos()
+
+    # Update the position of the Seed cursor
+    def set_input_cursor_pos(self):
+        self.input_cursor_x = self.align_right + self.input_cursor_offset*len(self.seed_input)
+        self.input_cursor_y = self.states_y[2] + 15

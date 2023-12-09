@@ -19,20 +19,7 @@ class Game():
         self.UP_KEY,   self.DOWN_KEY, self.START_KEY = False, False, False
         self.BACK_KEY, self.LEFT_KEY, self.RIGHT_KEY = False, False, False
         
-        # Choose and set window dimensions
-        self.width = Assets.DISPLAY_W
-        self.height = Assets.DISPLAY_H
-        
-        # Initialise game window
-        self.display = pygame.Surface((self.width,self.height))
-        self.window  = pygame.display.set_mode((self.width,self.height))
-
-        # Set window title
-        pygame.display.set_caption('Cave Game')
-
-        # Set game icon
-        pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE'].value))
-        # pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE_BG'].value))
+        self.to_windowed()
 
         # Initialise each menu and set the current one
         self.options         = OptionsMenu(self)
@@ -91,3 +78,39 @@ class Game():
         self.window.blit(self.display, (0, 0))
         pygame.display.update()
         self.reset_keys()
+
+    def to_fullscreen(self):
+        # Choose and set window dimensions
+        self.width = Assets.FULLSCREEN_W
+        self.height = Assets.FULLSCREEN_H
+
+        # Initialise window
+        self.display = pygame.Surface((self.width,self.height))
+        self.window = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        
+        # Set window title
+        pygame.display.set_caption('Cave Game')
+
+        # Set game icon
+        pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE'].value))
+        # pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE_BG'].value))
+
+        return self.display
+
+    def to_windowed(self):
+        # Choose and set window dimensions
+        self.width = Assets.DISPLAY_W
+        self.height = Assets.DISPLAY_H
+
+        # Initialise window
+        self.display = pygame.Surface((self.width,self.height))
+        self.window  = pygame.display.set_mode((self.width,self.height))
+
+        # Set window title
+        pygame.display.set_caption('Cave Game')
+
+        # Set game icon
+        pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE'].value))
+        # pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE_BG'].value))
+
+        return self.display

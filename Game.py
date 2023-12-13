@@ -1,4 +1,3 @@
-import os
 import pygame
 import Assets
 from MainMenu import MainMenu
@@ -9,14 +8,12 @@ from MapGenerator import MapGenerator
 from MissionControl import MissionControl
 
 class Game():
-    def __init__(self):
-        os.environ['SDL_VIDEO_CENTERED'] = '1'
-
+    def __init__(self): 
         # Initialise pygame features
         pygame.init()
         
         # If we run the game we are not necessary playing
-        self.running, self.playing = True, False
+        self.running, self.playing, self.map_ready = True, False, False
         
         # Initialise key flags to navigate in the menu
         self.UP_KEY,   self.DOWN_KEY, self.START_KEY = False, False, False
@@ -36,12 +33,12 @@ class Game():
         if self.playing:
             # Settings : [Map Dimension, Seed, Drone Number]
             self.sim_settings  = self.simulation.get_sim_settings()
-            
-            # Generate the map
+            # Call the MapGenerator to generate the cave
             self.cave_gen = MapGenerator(self)
-
-            # Prep and Start the mission
-            #self.mission_control = MissionControl(self)
+            # Call the MissionControl to generate the drones
+            self.mission_control = MissionControl(self)
+                
+             
 
    # Check player inputs
     def check_events(self):
@@ -50,7 +47,7 @@ class Game():
             match event.type:
                 # If the player clicks the x on top of the window exit the game
                 case pygame.QUIT:
-                    self.running, self.playing = False, False
+                    self.running, self.playing, self.map_ready = False, False, False
                     self.curr_menu.run_display = False
                 
                 # If the player clicks something on the keyboard
@@ -82,21 +79,21 @@ class Game():
         pygame.display.update()
         self.reset_keys()
 
-    def to_maximised(self):
+    def to_fullscreen(self):
         # Choose and set window dimensions
         self.width = Assets.FULLSCREEN_W
         self.height = Assets.FULLSCREEN_H
 
         # Initialise window
         self.display = pygame.Surface((self.width,self.height))
-        self.window = pygame.display.set_mode((self.width,self.height), pygame.SCALED)
+        self.window = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
         
         # Set window title
         pygame.display.set_caption('Cave Game')
 
         # Set game icon
-        pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE'].value))
-        # pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE_BG'].value))
+        pygame.display.set_icon(pygame.image.load(Assets.Images['GAME_ICON'].value))
+        # pygame.display.set_icon(pygame.image.load(Assets.Images['GAME_ICON_BG'].value))
 
         return self.display
 
@@ -107,13 +104,15 @@ class Game():
 
         # Initialise window
         self.display = pygame.Surface((self.width,self.height))
-        self.window  = pygame.display.set_mode((self.width,self.height), pygame.SCALED)
+        self.window  = pygame.display.set_mode((self.width,self.height))
 
         # Set window title
         pygame.display.set_caption('Cave Game')
 
         # Set game icon
-        pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE'].value))
-        # pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE_BG'].value))
+        pygame.display.set_icon(pygame.image.load(Assets.Images['GAME_ICON'].value))
+        # pygame.display.set_icon(pygame.image.load(Assets.Images['GAME_ICON_BG'].value))
 
         return self.display
+
+    

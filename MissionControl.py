@@ -8,6 +8,8 @@ class MissionControl():
         rand.seed(game.sim_settings[1])
 
         self.game = game
+        self.cave_gen = self.game.cave_gen
+        self.cave_map = self.cave_gen.bin_map
         self.settings = game.sim_settings
 
         # Initialise the Managers (and the robots)
@@ -25,8 +27,8 @@ class MissionControl():
             
             # Take one of the initial points of the worms as initial point for the drone
             i = rand.randint(0,3)
-            self.initial_point = [self.cave.worm_x[i],self.cave.worm_y[i]]
+            self.initial_point = [self.cave_gen.worm_x[i],self.cave_gen.worm_y[i]]
             
             # Check if the point is white or black
-            if self.cave.bin_map[self.initial_point[1]][self.initial_point[0]] == 0:  # White
+            if self.cave_map[self.initial_point[1]][self.initial_point[0]] == 0:  # White
                 good_point = True

@@ -5,9 +5,11 @@ import pygame
 from multiprocessing import Process
 import cv2
 import Assets
+import os
 
 class MapGenerator():
     def __init__(self, game):
+        
         self.game        = game
         self.settings    = game.sim_settings
         self.surface     = game.display
@@ -52,15 +54,8 @@ class MapGenerator():
 
         # Display the map
         self.draw_map(self.bin_map)
-
-        # Exit the simulation if the input is given
-        while self.game.playing:
-            self.game.check_events()
-            if self.game.BACK_KEY or self.game.START_KEY:
-                self.game.playing               = False
-                self.game.curr_menu.run_display = True
-                
-                self.surface = self.game.to_windowed()
+        
+        
 
     # Create multiple worms and let them eat the map simultaneously
     # while displaying the loading screen
@@ -127,9 +122,14 @@ class MapGenerator():
 
         return cleaned_image
 
-    # Dispaly the map in the window
+    # Dispaly the map in the window and save it 
     def draw_map(self, input_map, x1=0, x2=Assets.FULLSCREEN_W-1, y1=0, y2=Assets.FULLSCREEN_H-1):
-        self.surface = self.game.to_maximised()
+        
+        # Ensure the folder exists, create it if not
+        if not os.path.exists(os.path.join('Assets', 'Cave_map')):
+            os.makedirs(os.path.join('Assets', 'Cave_map'))
+            
+        self.surface = self.game.to_fullscreen()
 
         # Make the background black
         self.surface.fill(Assets.Colors['BLACK'].value)
@@ -141,8 +141,22 @@ class MapGenerator():
                 match input_map[y][x]:
                     case 0: pygame.draw.circle(self.surface, Assets.Colors['WHITE'].value, (x,y), 1)
                     case 2: pygame.draw.circle(self.surface, Assets.Colors['RED'].value, (x,y), 1)
+                    
         self.game.blit_screen()
-
+        
+        pygame.image.save(self.surface, Assets.Images['CAVE_MAP'].value)
+        
+        # Set the saved image as the new background
+        background_image = pygame.image.load(Assets.Images['CAVE_MAP'].value)
+         # Clear the game window
+        self.surface.fill(Assets.Colors['BLACK'].value)
+        
+        background_image = pygame.transform.scale(background_image, (Assets.FULLSCREEN_W, Assets.FULLSCREEN_H)) 
+        self.surface.blit(background_image, (0, 0))
+        pygame.display.flip()
+       
+        
+        
     # Model a worm that eats away randomically at the map
     def worm(self, x, y, step, stren, life, id):
         while life:

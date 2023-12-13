@@ -19,7 +19,7 @@ class Game():
         self.UP_KEY,   self.DOWN_KEY, self.START_KEY = False, False, False
         self.BACK_KEY, self.LEFT_KEY, self.RIGHT_KEY = False, False, False
         
-        self.to_windowed()
+        self.create_window()
 
         # Initialise each menu and set the current one
         self.options         = OptionsMenu(self)
@@ -38,7 +38,7 @@ class Game():
             self.cave_gen = MapGenerator(self)
 
             # Prep and Start the mission
-            #self.mission_control = MissionControl(self)
+            self.mission_control = MissionControl(self)
 
    # Check player inputs
     def check_events(self):
@@ -79,32 +79,34 @@ class Game():
         pygame.display.update()
         self.reset_keys()
 
-    def to_fullscreen(self):
-        # Choose and set window dimensions
+    def toggle_fullscreen(self):
+        """ # Choose and set window dimensions
         self.width = Assets.FULLSCREEN_W
         self.height = Assets.FULLSCREEN_H
 
         # Initialise window
         self.display = pygame.Surface((self.width,self.height))
-        self.window = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        self.window = pygame.display.set_mode((self.width,self.height), pygame.SCALED)
         
         # Set window title
         pygame.display.set_caption('Cave Game')
 
         # Set game icon
         pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE'].value))
-        # pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE_BG'].value))
+        # pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE_BG'].value)) """
+
+        pygame.display.toggle_fullscreen()
 
         return self.display
 
-    def to_windowed(self):
+    def create_window(self):
         # Choose and set window dimensions
         self.width = Assets.DISPLAY_W
         self.height = Assets.DISPLAY_H
 
         # Initialise window
         self.display = pygame.Surface((self.width,self.height))
-        self.window  = pygame.display.set_mode((self.width,self.height))
+        self.window  = pygame.display.set_mode((self.width,self.height), pygame.SCALED)
 
         # Set window title
         pygame.display.set_caption('Cave Game')

@@ -10,8 +10,8 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Display dimensions
 DISPLAY_W = 1200
 DISPLAY_H = 750
-FULLSCREEN_W = root.winfo_screenwidth() - 5
-FULLSCREEN_H = root.winfo_screenheight() - 70
+FULLSCREEN_W = root.winfo_screenwidth()
+FULLSCREEN_H = root.winfo_screenheight()
 
 # Lists for menu voices and settings
 main_menu_states    = ['Start', 'Options', 'Credits', 'Exit']
@@ -43,11 +43,15 @@ class Audio(Enum):
         AMBIENT    = os.path.join(CURRENT_DIR, 'Assets', 'Audio', 'Menu.wav')
         BUTTON     = os.path.join(CURRENT_DIR, 'Assets', 'Audio', 'Button.wav')
 
-class Backgrounds(Enum):
-        CAVE       = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'cave.jpg')
-        DARK_CAVE  = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'cave_black.jpg')
-        DRONE      = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone.png')
-        DRONE_BG   = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone_BG.jpg')
+class Images(Enum):
+        CAVE         = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'cave.jpg')
+        DARK_CAVE    = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'cave_black.jpg')
+        GAME_ICON    = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone.png')
+        GAME_ICON_BG = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone_BG.jpg')
+        ROVER        = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'RoverTop.png')
+        DRONE        = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'DroneTop.png')
+        CAVE_MAP     = os.path.join(CURRENT_DIR, 'Assets', 'Cave_map', 'Map.png')
+
 
 class RectHandle(Enum):
         CENTER     = 'Center'

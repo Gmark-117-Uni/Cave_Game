@@ -1,3 +1,4 @@
+import os
 import pygame
 import Assets
 from MainMenu import MainMenu
@@ -8,7 +9,9 @@ from MapGenerator import MapGenerator
 from MissionControl import MissionControl
 
 class Game():
-    def __init__(self): 
+    def __init__(self):
+        os.environ['SDL_VIDEO_CENTERED'] = '1'
+
         # Initialise pygame features
         pygame.init()
         
@@ -19,7 +22,7 @@ class Game():
         self.UP_KEY,   self.DOWN_KEY, self.START_KEY = False, False, False
         self.BACK_KEY, self.LEFT_KEY, self.RIGHT_KEY = False, False, False
         
-        self.create_window()
+        self.to_windowed()
 
         # Initialise each menu and set the current one
         self.options         = OptionsMenu(self)
@@ -38,7 +41,7 @@ class Game():
             self.cave_gen = MapGenerator(self)
 
             # Prep and Start the mission
-            self.mission_control = MissionControl(self)
+            #self.mission_control = MissionControl(self)
 
    # Check player inputs
     def check_events(self):
@@ -79,8 +82,8 @@ class Game():
         pygame.display.update()
         self.reset_keys()
 
-    def toggle_fullscreen(self):
-        """ # Choose and set window dimensions
+    def to_fullscreen(self):
+        # Choose and set window dimensions
         self.width = Assets.FULLSCREEN_W
         self.height = Assets.FULLSCREEN_H
 
@@ -93,13 +96,11 @@ class Game():
 
         # Set game icon
         pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE'].value))
-        # pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE_BG'].value)) """
-
-        pygame.display.toggle_fullscreen()
+        # pygame.display.set_icon(pygame.image.load(Assets.Backgrounds['DRONE_BG'].value))
 
         return self.display
 
-    def create_window(self):
+    def to_windowed(self):
         # Choose and set window dimensions
         self.width = Assets.DISPLAY_W
         self.height = Assets.DISPLAY_H

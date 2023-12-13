@@ -60,7 +60,7 @@ class MapGenerator():
                 self.game.playing               = False
                 self.game.curr_menu.run_display = True
                 
-                self.surface = self.game.toggle_fullscreen()
+                self.surface = self.game.to_windowed()
 
     # Create multiple worms and let them eat the map simultaneously
     # while displaying the loading screen
@@ -129,7 +129,7 @@ class MapGenerator():
 
     # Dispaly the map in the window
     def draw_map(self, input_map, x1=0, x2=Assets.FULLSCREEN_W-1, y1=0, y2=Assets.FULLSCREEN_H-1):
-        self.surface = self.game.toggle_fullscreen()
+        self.surface = self.game.to_maximised()
 
         # Make the background black
         self.surface.fill(Assets.Colors['BLACK'].value)

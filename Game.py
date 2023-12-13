@@ -82,7 +82,7 @@ class Game():
         pygame.display.update()
         self.reset_keys()
 
-    def to_fullscreen(self):
+    def to_maximised(self):
         # Choose and set window dimensions
         self.width = Assets.FULLSCREEN_W
         self.height = Assets.FULLSCREEN_H

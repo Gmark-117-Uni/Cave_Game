@@ -31,7 +31,6 @@ class MissionControl():
         
         # Create the drones
         self.drone_gen()
-        
 
     # Among the starting positions of the worms, find one that is viable
     def set_start_pos(self):
@@ -50,10 +49,10 @@ class MissionControl():
                 
     # Generate a new drone rect for each drone
     def drone_gen(self):
-        nbr_drone = self.settings[2]
-        print("the nbr of drones is", nbr_drone)
+        num_drones = self.settings[2]
+        print("the nbr of drones is", num_drones)
 
-        for _ in range(nbr_drone):
+        for _ in range(num_drones):
             # Create a new drone rect for each drone
             drone_rect = self.drone.get_rect()
 

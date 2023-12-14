@@ -10,7 +10,7 @@ CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 # Display dimensions
 DISPLAY_W = 1200
 DISPLAY_H = 750
-FULLSCREEN_W = root.winfo_screenwidth() - 5
+FULLSCREEN_W = 1920 - 5
 FULLSCREEN_H = root.winfo_screenheight() - 70
 
 # Lists for menu voices and settings
@@ -19,7 +19,7 @@ options_menu_states = ['Game Volume', 'Music Volume', 'Button Sound', 'Back']
 sim_menu_states     = ['Mode', 'Map Dimension', 'Seed', 'Drones', 'Back', 'Start Simulation']
 mode_options        = ["Cave exploration", "Rescue mission"]
 map_options         = ["Small", "Medium", "Big"]
-seed                = [     6,       19,    837]
+seed                = [     5,       19,    837]
 
 class Colors(Enum):
         BLACK      = (0, 0, 0)

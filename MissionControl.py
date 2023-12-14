@@ -32,6 +32,13 @@ class MissionControl():
         # Create the drones
         self.drone_gen()
 
+        while self.game.playing:
+            self.game.check_events()
+            if self.game.BACK_KEY or self.game.START_KEY:
+                self.game.playing = False
+                self.game.curr_menu.run_display = True
+                self.game.to_windowed()
+
     # Among the starting positions of the worms, find one that is viable
     def set_start_pos(self):
         good_point = False

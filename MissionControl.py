@@ -15,9 +15,8 @@ class MissionControl():
         self.cave_gen = self.game.cave_gen
         self.cave_map = self.cave_gen.bin_map
         self.surface= game.display
-        
         self.original_drone = pygame.image.load(Assets.Images['DRONE'].value)
-        self.drone = pygame.transform.scale(self.original_drone, (10,10))
+        self.drone = pygame.transform.scale(self.original_drone, (1000,1000))
         
         # Initialise the Managers (and the robots)
         #self.drone_manager = DroneManager(game, self.settings[2])
@@ -31,14 +30,15 @@ class MissionControl():
         
         # Create the drones
         self.drone_gen()
-
+        
+        # Exit the simulation if the input is given
         while self.game.playing:
             self.game.check_events()
             if self.game.BACK_KEY or self.game.START_KEY:
                 self.game.playing = False
                 self.game.curr_menu.run_display = True
-                self.game.to_windowed()
-
+                #self.game.to_windowed()
+                
     # Among the starting positions of the worms, find one that is viable
     def set_start_pos(self):
         good_point = False
@@ -75,20 +75,10 @@ class MissionControl():
     # Actually draw all the drones
     def draw_drones(self):
         
-        self.game.blit_screen()
-        
-        background_image = pygame.image.load(Assets.Images['CAVE_MAP'].value)
-        # Create a temporary surface with the background
-        temp_surface = background_image.copy()
-        
-        self.surface.blit(self.drone, (0, 0))
-        
         # Draw all drones on the temporary surface
         for drone_rect in self.drone_rects:
-            temp_surface.blit(self.drone, drone_rect.center)  
+            self.game.window.blit(self.drone, drone_rect.center)  
 
-        # Blit the temporary surface onto the game window
-        self.surface.blit(temp_surface, (0, 0))
 
         # Update the display
         pygame.display.update()

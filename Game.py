@@ -1,3 +1,4 @@
+import os
 import pygame
 import Assets
 from MainMenu import MainMenu
@@ -9,6 +10,8 @@ from MissionControl import MissionControl
 
 class Game():
     def __init__(self): 
+        os.environ['SDL_VIDEO_CENTERED'] = '1'
+
         # Initialise pygame features
         pygame.init()
         
@@ -33,9 +36,9 @@ class Game():
         if self.playing:
             # Settings : [Map Dimension, Seed, Drone Number]
             self.sim_settings  = self.simulation.get_sim_settings()
-            # Call the MapGenerator to generate the cave
+            # Generate the cave
             self.cave_gen = MapGenerator(self)
-            # Call the MissionControl to generate the drones
+            # Prep and Start the mission
             self.mission_control = MissionControl(self)
                 
              
@@ -79,14 +82,14 @@ class Game():
         pygame.display.update()
         self.reset_keys()
 
-    def to_fullscreen(self):
+    def to_maximised(self):
         # Choose and set window dimensions
         self.width = Assets.FULLSCREEN_W
         self.height = Assets.FULLSCREEN_H
 
         # Initialise window
         self.display = pygame.Surface((self.width,self.height))
-        self.window = pygame.display.set_mode((0,0), pygame.FULLSCREEN)
+        self.window = pygame.display.set_mode((self.width,self.height), pygame.SCALED)
         
         # Set window title
         pygame.display.set_caption('Cave Game')
@@ -104,7 +107,7 @@ class Game():
 
         # Initialise window
         self.display = pygame.Surface((self.width,self.height))
-        self.window  = pygame.display.set_mode((self.width,self.height))
+        self.window  = pygame.display.set_mode((self.width,self.height), pygame.SCALED)
 
         # Set window title
         pygame.display.set_caption('Cave Game')

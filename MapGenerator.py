@@ -129,7 +129,7 @@ class MapGenerator():
         if not os.path.exists(os.path.join('Assets', 'Cave_map')):
             os.makedirs(os.path.join('Assets', 'Cave_map'))
             
-        self.surface = self.game.to_fullscreen()
+        self.surface = self.game.to_maximised()
 
         # Make the background black
         self.surface.fill(Assets.Colors['BLACK'].value)
@@ -153,7 +153,7 @@ class MapGenerator():
         
         background_image = pygame.transform.scale(background_image, (Assets.FULLSCREEN_W, Assets.FULLSCREEN_H)) 
         self.surface.blit(background_image, (0, 0))
-        pygame.display.flip()
+        pygame.display.update()
        
         
         

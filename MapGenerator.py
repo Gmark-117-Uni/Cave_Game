@@ -52,11 +52,10 @@ class MapGenerator():
         # Perform image processing on the result
         self.process_map()
 
-        # Display the map
+        # Display and save the map
         self.draw_map(self.bin_map)
+        self.save_map()
         
-        
-
     # Create multiple worms and let them eat the map simultaneously
     # while displaying the loading screen
     def dig_map(self, proc_num):
@@ -122,13 +121,8 @@ class MapGenerator():
 
         return cleaned_image
 
-    # Dispaly the map in the window and save it 
+    # Dispaly the map in the window
     def draw_map(self, input_map, x1=0, x2=Assets.FULLSCREEN_W-1, y1=0, y2=Assets.FULLSCREEN_H-1):
-        
-        # Ensure the folder exists, create it if not
-        if not os.path.exists(os.path.join('Assets', 'Cave_map')):
-            os.makedirs(os.path.join('Assets', 'Cave_map'))
-            
         self.surface = self.game.to_maximised()
 
         # Make the background black
@@ -143,6 +137,12 @@ class MapGenerator():
                     case 2: pygame.draw.circle(self.surface, Assets.Colors['RED'].value, (x,y), 1)
                     
         self.game.blit_screen()
+
+    # Save the generated map
+    def save_map(self):
+        # Ensure the folder exists, create it if not
+        if not os.path.exists(os.path.join('Assets', 'Cave_map')):
+            os.makedirs(os.path.join('Assets', 'Cave_map'))
         
         pygame.image.save(self.surface, Assets.Images['CAVE_MAP'].value)
         
@@ -155,8 +155,6 @@ class MapGenerator():
         self.surface.blit(background_image, (0, 0))
         pygame.display.update()
        
-        
-        
     # Model a worm that eats away randomically at the map
     def worm(self, x, y, step, stren, life, id):
         while life:
@@ -181,10 +179,6 @@ class MapGenerator():
         
         self.proc_counter += 1
         self.game.curr_menu.loading_screen(self.proc_counter, 'Digging...')
-
-    # Calculate the square of the passed argument
-    def sqr(self, x):
-        return x**2
 
     # Avoid collision with the window borders
     def border_control(self, x1, x2, y1, y2, stren, new_dir=True):
@@ -405,3 +399,7 @@ class MapGenerator():
         y_max = self.worm_y[target] + 2*step
 
         return x_min, x_max, y_min, y_max, target
+
+    # Calculate the square of the passed argument
+    def sqr(self, x):
+        return x**2

@@ -21,11 +21,6 @@ mode_options        = ["Cave exploration", "Rescue mission"]
 map_options         = ["Small", "Medium", "Big"]
 seed                = [     6,       19,    837]
 
-# Map Generator Inputs
-step = 10
-strength = 16
-life = 75
-
 class Colors(Enum):
         BLACK      = (0, 0, 0)
         WHITE      = (255, 255, 255)
@@ -51,7 +46,6 @@ class Images(Enum):
         ROVER        = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'RoverTop.png')
         DRONE        = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'DroneTop.png')
         CAVE_MAP     = os.path.join(CURRENT_DIR, 'Assets', 'Cave_map', 'Map.png')
-
 
 class RectHandle(Enum):
         CENTER     = 'Center'
@@ -85,6 +79,11 @@ class Brush(Enum):
         DIAMOND     = 3
         OCTAGON     = 4
         RECTANGULAR = 5
+
+# Map Generator Inputs
+step = 10
+strength = 16
+life = 75
 
 class WormInputs(Enum):
         SMALL  = [4*step, 4*strength,    life]

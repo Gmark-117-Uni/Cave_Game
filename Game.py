@@ -40,8 +40,6 @@ class Game():
             self.cave_gen = MapGenerator(self)
             # Prep and Start the mission
             self.mission_control = MissionControl(self)
-                
-             
 
    # Check player inputs
     def check_events(self):
@@ -82,6 +80,7 @@ class Game():
         pygame.display.update()
         self.reset_keys()
 
+    # Maximise the window
     def to_maximised(self):
         # Choose and set window dimensions
         self.width = Assets.FULLSCREEN_W
@@ -100,6 +99,7 @@ class Game():
 
         return self.display
 
+    # Return to the originial window dimensions
     def to_windowed(self):
         # Choose and set window dimensions
         self.width = Assets.DISPLAY_W
@@ -117,5 +117,3 @@ class Game():
         # pygame.display.set_icon(pygame.image.load(Assets.Images['GAME_ICON_BG'].value))
 
         return self.display
-
-    

@@ -18,8 +18,8 @@ class Menu():
         self.run_display = True
         
         # Load backgrounds
-        self.background      = pygame.image.load(Assets.Backgrounds['CAVE'].value)
-        self.dark_background = pygame.image.load(Assets.Backgrounds['DARK_CAVE'].value)
+        self.background      = pygame.image.load(Assets.Images['CAVE'].value)
+        self.dark_background = pygame.image.load(Assets.Images['DARK_CAVE'].value)
 
         # Load the ambient audio file
         mix.music.load(Assets.Audio['AMBIENT'].value)  

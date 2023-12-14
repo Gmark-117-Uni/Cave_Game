@@ -209,7 +209,7 @@ class OptionsMenu(Menu):
     # Load from file or initialise options
     def load_options(self):
         # Set configuration file path
-        config_path = (os.path.join(Assets.CURRENT_DIR, 'GameConfig', 'options.ini'))  
+        config_path = (os.path.join(Assets.GAME_DIR, 'GameConfig', 'options.ini'))  
         
         # Initialise options for the very first time
         if not os.path.exists(config_path):
@@ -233,7 +233,7 @@ class OptionsMenu(Menu):
     # Save selected options
     def save_options(self):
         # Set configuration file path
-        config_path = (os.path.join(Assets.CURRENT_DIR, 'GameConfig', 'options.ini'))  
+        config_path = (os.path.join(Assets.GAME_DIR, 'GameConfig', 'options.ini'))  
         config      = configparser.ConfigParser()
         
         # Define the options values

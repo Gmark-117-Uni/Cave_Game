@@ -57,7 +57,7 @@ class MissionControl():
     # Generate a new drone rect for each drone
     def drone_gen(self):
         num_drones = self.settings[2]
-        print("the nbr of drones is", num_drones)
+        print("the number of drones is", num_drones)
 
         for _ in range(num_drones):
             # Create a new drone rect for each drone

@@ -21,7 +21,7 @@ class SimulationMenu(Menu):
 
         self.mode     = 0
         self.map_dim  = 0
-        self.n_drones = 2
+        self.n_drones = 3
        
         # Define positions for menu text
         self.align_left      = self.mid_w - 50
@@ -239,7 +239,7 @@ class SimulationMenu(Menu):
                 case 'Drones':
                     match self.n_drones:
                         case 8:
-                            self.n_drones = 2
+                            self.n_drones = 3
                         case _:
                             self.n_drones += 1
                     return
@@ -278,7 +278,7 @@ class SimulationMenu(Menu):
     # Save selected options
     def save_symSettings(self):
         # Set configuration file path
-        config_path = (os.path.join(Assets.CURRENT_DIR, 'GameConfig', 'symSettings.ini'))  
+        config_path = (os.path.join(Assets.GAME_DIR, 'GameConfig', 'symSettings.ini'))  
         config = configparser.ConfigParser()
 
         # Define the options values

@@ -53,8 +53,8 @@ class MapGenerator():
         self.process_map()
 
         # Display and save the map
-        self.draw_map(self.bin_map)
         self.save_map()
+        self.draw_map()
         
     # Create multiple worms and let them eat the map simultaneously
     # while displaying the loading screen
@@ -122,8 +122,8 @@ class MapGenerator():
         return cleaned_image
 
     # Dispaly the map in the window
-    def draw_map(self, input_map, x1=0, x2=Assets.FULLSCREEN_W-1, y1=0, y2=Assets.FULLSCREEN_H-1):
-        self.surface = self.game.to_maximised()
+    def draw_map(self): #, input_map, x1=0, x2=Assets.FULLSCREEN_W-1, y1=0, y2=Assets.FULLSCREEN_H-1):
+        """ self.surface = self.game.to_maximised()
 
         # Make the background black
         self.surface.fill(Assets.Colors['BLACK'].value)
@@ -136,24 +136,32 @@ class MapGenerator():
                     case 0: pygame.draw.circle(self.surface, Assets.Colors['WHITE'].value, (x,y), 1)
                     case 2: pygame.draw.circle(self.surface, Assets.Colors['RED'].value, (x,y), 1)
                     
+        self.game.blit_screen() """
+
+        # Maximise the game window
+        self.surface = self.game.to_maximised()
+
+        # Set the map as the new background
+        background_image = pygame.image.load(Assets.Images['CAVE_MAP'].value)
+        self.surface.blit(background_image, (0, 0))
         self.game.blit_screen()
 
     # Save the generated map
     def save_map(self):
-        # Ensure the folder exists, create it if not
-        if not os.path.exists(os.path.join('Assets', 'Cave_map')):
-            os.makedirs(os.path.join('Assets', 'Cave_map'))
-        
-        pygame.image.save(self.surface, Assets.Images['CAVE_MAP'].value)
-        
-        # Set the saved image as the new background
-        background_image = pygame.image.load(Assets.Images['CAVE_MAP'].value)
-         # Clear the game window
-        self.surface.fill(Assets.Colors['BLACK'].value)
-        
-        background_image = pygame.transform.scale(background_image, (Assets.FULLSCREEN_W, Assets.FULLSCREEN_H)) 
-        self.surface.blit(background_image, (0, 0))
-        pygame.display.update()
+        # Ensure the folder exists, otherwise create it
+        if not os.path.exists(os.path.join('Assets', 'Cave_Map')):
+            os.makedirs(os.path.join('Assets', 'Cave_Map'))
+
+        # Change the current directory
+        directory = os.path.join(Assets.GAME_DIR, 'Assets', 'Cave_Map')
+        os.chdir(directory)
+
+        # Extend values from [0,1] to [0,255]
+        byte_map = np.where(self.bin_map==1, 0, 255)
+
+        # Save the map as a PNG image and change back the directory
+        cv2.imwrite('map.png', byte_map)
+        os.chdir(Assets.GAME_DIR)
        
     # Model a worm that eats away randomically at the map
     def worm(self, x, y, step, stren, life, id):

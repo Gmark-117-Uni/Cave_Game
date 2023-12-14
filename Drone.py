@@ -9,5 +9,3 @@ class Drone():
     # Draw the drone on the map
     def draw_drone(self, pos):
         pass
-
-#GianmarcoPuzza

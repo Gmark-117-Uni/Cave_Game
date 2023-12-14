@@ -6,7 +6,7 @@ root = tkinter.Tk()
 
 # Game directory: ..\CaveGame
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-
+#dfbewyfjg
 # Display dimensions
 DISPLAY_W = 1200
 DISPLAY_H = 750

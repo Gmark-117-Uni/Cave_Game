@@ -5,12 +5,12 @@ from enum import Enum
 root = tkinter.Tk()
 
 # Game directory: ..\CaveGame
-GAME_DIR = os.path.dirname(os.path.abspath(__file__))
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Display dimensions
 DISPLAY_W = 1200
 DISPLAY_H = 750
-FULLSCREEN_W = 1920 - 5 # root.winfo_screenwidth() - 5
+FULLSCREEN_W = root.winfo_screenwidth() - 5
 FULLSCREEN_H = root.winfo_screenheight() - 70
 
 # Lists for menu voices and settings
@@ -22,30 +22,38 @@ map_options         = ["Small", "Medium", "Big"]
 seed                = [     5,       19,    837]
 
 class Colors(Enum):
-        BLACK      = (0, 0, 0)
-        WHITE      = (255, 255, 255)
-        EUCALYPTUS = (95, 133, 117)
-        GREENDARK  = (117,132,104)
-        RED        = (255,0,0)
-        GREEN      = (0,255,0)
-        BLUE       = (0,0,255)
+        BLACK        = (0, 0, 0)
+        WHITE        = (255, 255, 255)
+        EUCALYPTUS   = (95, 133, 117)
+        GREENDARK    = (117,132,104)
+        RED          = (255,0,0)
+        
+class DroneColors(Enum):
+        PINK         = (255,51,153)
+        VIOLET       = (153,51,255)
+        BLUE         = (0,0,153)
+        L_BLUE       = (51,255,255)
+        GREEN        = (51,255,51)
+        YELLOW       = (255,255,51)
+        ORANGE       = (255,128,0)
+        RED          = (255,0,0)
         
 class Fonts(Enum):
-        BIG        = os.path.join(GAME_DIR, 'Assets', 'Fonts', 'Cave-Stone.ttf')  
-        SMALL      = os.path.join(GAME_DIR, 'Assets', 'Fonts', '8-BIT.TTF') 
+        BIG        = os.path.join(CURRENT_DIR, 'Assets', 'Fonts', 'Cave-Stone.ttf')  
+        SMALL      = os.path.join(CURRENT_DIR, 'Assets', 'Fonts', '8-BIT.TTF') 
         
 class Audio(Enum):
-        AMBIENT    = os.path.join(GAME_DIR, 'Assets', 'Audio', 'Menu.wav')
-        BUTTON     = os.path.join(GAME_DIR, 'Assets', 'Audio', 'Button.wav')
+        AMBIENT    = os.path.join(CURRENT_DIR, 'Assets', 'Audio', 'Menu.wav')
+        BUTTON     = os.path.join(CURRENT_DIR, 'Assets', 'Audio', 'Button.wav')
 
 class Images(Enum):
-        CAVE         = os.path.join(GAME_DIR, 'Assets', 'Images', 'cave.jpg')
-        DARK_CAVE    = os.path.join(GAME_DIR, 'Assets', 'Images', 'cave_black.jpg')
-        GAME_ICON    = os.path.join(GAME_DIR, 'Assets', 'Images', 'drone.png')
-        GAME_ICON_BG = os.path.join(GAME_DIR, 'Assets', 'Images', 'drone_BG.jpg')
-        ROVER        = os.path.join(GAME_DIR, 'Assets', 'Images', 'rover_top.png')
-        DRONE        = os.path.join(GAME_DIR, 'Assets', 'Images', 'drone_top.png')
-        CAVE_MAP     = os.path.join(GAME_DIR, 'Assets', 'Cave_Map', 'map.png')
+        CAVE         = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'cave.jpg')
+        DARK_CAVE    = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'cave_black.jpg')
+        GAME_ICON    = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone.png')
+        GAME_ICON_BG = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone_BG.jpg')
+        ROVER        = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'rover_top.png')
+        DRONE        = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone_top.png')
+        CAVE_MAP     = os.path.join(CURRENT_DIR, 'Assets', 'Cave_map', 'map.png')
 
 class RectHandle(Enum):
         CENTER     = 'Center'

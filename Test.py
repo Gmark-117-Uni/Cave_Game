@@ -1,1 +1,3 @@
-print(-1%3)
+from art import tprint
+
+tprint('TITLE')

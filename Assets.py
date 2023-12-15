@@ -21,6 +21,11 @@ mode_options        = ["Cave exploration", "Rescue mission"]
 map_options         = ["Small", "Medium", "Big"]
 seed                = [     5,       19,    837]
 
+
+# Calculate the square of the passed argument
+def sqr(x):
+        return x**2
+
 class Colors(Enum):
         BLACK        = (0, 0, 0)
         WHITE        = (255, 255, 255)

@@ -17,8 +17,10 @@ class MissionControl():
         self.cave_map = self.cave_gen.bin_map
         self.cave_png = Assets.Images['CAVE_MAP'].value
         self.surface= game.display
-        self.original_drone = pygame.image.load(Assets.Images['DRONE'].value)
-        self.drone = pygame.transform.scale(self.original_drone, (70,70))
+
+        # Set drone icones
+        self.drone_icon = pygame.image.load(Assets.Images['DRONE'].value)
+        self.drone = pygame.transform.scale(self.drone_icon, (70,70))
         
         # List to store drone colors
         self.drone_colors = []

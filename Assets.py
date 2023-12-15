@@ -5,7 +5,7 @@ from enum import Enum
 root = tkinter.Tk()
 
 # Game directory: ..\CaveGame
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+GAME_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # Display dimensions
 DISPLAY_W = 1200
@@ -39,21 +39,21 @@ class DroneColors(Enum):
         RED          = (255,0,0)
         
 class Fonts(Enum):
-        BIG        = os.path.join(CURRENT_DIR, 'Assets', 'Fonts', 'Cave-Stone.ttf')  
-        SMALL      = os.path.join(CURRENT_DIR, 'Assets', 'Fonts', '8-BIT.TTF') 
+        BIG        = os.path.join(GAME_DIR, 'Assets', 'Fonts', 'Cave-Stone.ttf')  
+        SMALL      = os.path.join(GAME_DIR, 'Assets', 'Fonts', '8-BIT.TTF') 
         
 class Audio(Enum):
-        AMBIENT    = os.path.join(CURRENT_DIR, 'Assets', 'Audio', 'Menu.wav')
-        BUTTON     = os.path.join(CURRENT_DIR, 'Assets', 'Audio', 'Button.wav')
+        AMBIENT    = os.path.join(GAME_DIR, 'Assets', 'Audio', 'Menu.wav')
+        BUTTON     = os.path.join(GAME_DIR, 'Assets', 'Audio', 'Button.wav')
 
 class Images(Enum):
-        CAVE         = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'cave.jpg')
-        DARK_CAVE    = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'cave_black.jpg')
-        GAME_ICON    = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone.png')
-        GAME_ICON_BG = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone_BG.jpg')
-        ROVER        = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'rover_top.png')
-        DRONE        = os.path.join(CURRENT_DIR, 'Assets', 'Images', 'drone_top.png')
-        CAVE_MAP     = os.path.join(CURRENT_DIR, 'Assets', 'Cave_map', 'map.png')
+        CAVE         = os.path.join(GAME_DIR, 'Assets', 'Images', 'cave.jpg')
+        DARK_CAVE    = os.path.join(GAME_DIR, 'Assets', 'Images', 'cave_black.jpg')
+        GAME_ICON    = os.path.join(GAME_DIR, 'Assets', 'Images', 'drone.png')
+        GAME_ICON_BG = os.path.join(GAME_DIR, 'Assets', 'Images', 'drone_BG.jpg')
+        ROVER        = os.path.join(GAME_DIR, 'Assets', 'Images', 'rover_top.png')
+        DRONE        = os.path.join(GAME_DIR, 'Assets', 'Images', 'drone_top.png')
+        CAVE_MAP     = os.path.join(GAME_DIR, 'Assets', 'Cave_Map', 'map.png')
 
 class RectHandle(Enum):
         CENTER     = 'Center'

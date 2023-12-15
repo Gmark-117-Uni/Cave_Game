@@ -59,13 +59,12 @@ class MissionControl():
     def drone_gen(self):
         num_drones = self.settings[2]
         print("the number of drones is", num_drones)
-        step = 30
-        for i in range(num_drones):
+        for _ in range(num_drones):
             # Create a new drone rect for each drone
             drone_rect = self.drone.get_rect()
 
             # Set the center of the drone_rect to the initial point
-            drone_rect.center = (self.initial_point[0]+i*step, self.initial_point[1])
+            drone_rect.center = self.initial_point
 
             # Add the new drone_rect to the list
             self.drone_rects.append(drone_rect)

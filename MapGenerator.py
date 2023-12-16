@@ -277,12 +277,11 @@ class MapGenerator():
 
     # Ensure there are no inacessible rooms
     def connect_rooms(self, x, y, step, stren, id):
-
         x_min, x_max, y_min, y_max, target = self.assign_target(step, id)
-        probability = 100
+        life = 100
 
-        while (x<x_min or x>x_max or y<y_min or y>y_max):
-            self.dir = self.homing_sys(x, y, target, probability)
+        while (x<x_min or x>x_max or y<y_min or y>y_max or life>=0):
+            self.dir = self.homing_sys(x, y, target)
 
             # Borders
             x1 = max(x - stren, 0) # Adjust for legend
@@ -300,17 +299,17 @@ class MapGenerator():
             self.border_control(x1, x2, y1, y2, stren, new_dir=False)
             
             x, y = self.next_cell_coords(x, y, step, self.dir)
-            probability -= 1
+            life -= 1
 
     # Set the course for the starting point of the closest worm
-    def homing_sys(self, x, y, target, probability):
+    def homing_sys(self, x, y, target):
         # Calculate the direction to get to the target
         rad_dir    = math.atan2((y - self.worm_y[target]), (x - self.worm_x[target]))
         deg_dir    = (rad_dir if rad_dir >= 0 else (2*math.pi + rad_dir)) * 180 / math.pi
         target_dir = int(deg_dir - 90 if deg_dir>=90 else deg_dir + 270)
 
         # Randomically change direction to maintain realism
-        if rand.randint(0,100)<probability:
+        if not rand.randint(0,1):
             target_dir = (target_dir + rand.randint(-90,90)) % 360
 
         # Check if direction is valid because I don't trust myself

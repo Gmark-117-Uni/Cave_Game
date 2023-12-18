@@ -1,5 +1,6 @@
 import random as rand
-from Fleet import Fleet
+from DroneManager import DroneManager
+from RoverManager import RoverManager
 import pygame
 import Assets
 
@@ -12,38 +13,27 @@ class MissionControl():
         self.settings = game.sim_settings
         self.cave_gen = self.game.cave_gen
         self.cave_map = self.cave_gen.bin_map
+        self.surface = game.display
         self.cave_png = Assets.Images['CAVE_MAP'].value
-        self.black_cave_png = Assets.Images['BLACK_CAVE_MAP'].value
-        self.surface= game.display
         
-        # Save the borders
+        # Save the borders of the cave
         self.save_black_mask()
-
-        # Find a suitable start position
-        self.set_start_pos()
+        self.black_cave_png = Assets.Images['BLACK_CAVE_MAP'].value
         
+        # Find a suitable start position
+        self.set_initial_point()
         # Start mission
         self.start_mission()
-        
-        # Exit the simulation if the input is given
-        while self.game.playing:
-            pygame.display.update()
-            self.game.check_events()
-
-            if self.game.BACK_KEY or self.game.START_KEY:
-                self.game.playing = False
-                self.game.curr_menu.run_display = True
-                self.game.to_windowed()
-
+          
+                            
     def start_mission(self):
-        # Create the drones
-        self.fleet = Fleet(self.game, self, self.start_pos)
-
+        # Create the drones 
+        self.drone_manager = DroneManager(self.game, self.initial_point)
         # Keep moving the drones
         while True:
-            self.fleet.move_drones()
-            self.clear_previous_drones()
-    
+            self.drone_manager.set_start_point()
+           
+            
     def save_black_mask (self):
         # Load the CAVE_MAP image
         cave_map = pygame.image.load(self.cave_png).convert_alpha()
@@ -59,24 +49,18 @@ class MissionControl():
                 # Set the pixel color in the modified surface
                 modified_cave_map.set_at((x, y), pixel_color)
         # Save the modified map
-        pygame.image.save(modified_cave_map, Assets.Images['BLACK_CAVE_MAP'].value)
-
+        pygame.image.save(modified_cave_map,Assets.Images['BLACK_CAVE_MAP'].value)
+        
+        
     # Among the starting positions of the worms, find one that is viable
-    def set_start_pos(self):
+    def set_initial_point(self):
         good_point = False
         while not good_point:  
-            # Take one of the starting positions of the worms as the start position for the mission
+            # Take one of the initial points of the worms as initial point for the drone
             i = rand.randint(0,3)
-            self.start_pos = (self.cave_gen.worm_x[i],self.cave_gen.worm_y[i])
-
-            # If the point is white choose it as a start position
-            if self.cave_map[self.start_pos[1]][self.start_pos[0]] == 0:  # White
+            self.initial_point = (self.cave_gen.worm_x[i],self.cave_gen.worm_y[i])
+            # Check if the point is white or black
+            if self.cave_map[self.initial_point[1]][self.initial_point[0]] == 0:  # White
                 good_point = True
-
-    def clear_previous_drones(self):
-        # Load the CAVE_MAP image
-        cave_map = pygame.image.load(self.cave_png).convert_alpha()
-        # Draw the CAVE_MAP image onto the game window
-        self.game.window.blit(cave_map, (0, 0))
-        # Update the display
-        pygame.display.update()
+                
+   

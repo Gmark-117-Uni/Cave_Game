@@ -305,7 +305,11 @@ class SimulationMenu(Menu):
                     self.n_drones]
         
         return settings
-
+    
+    def get_mode(self):
+        mode =[self.mode]
+        return mode
+    
     # Set the seed
     def set_seed_input(self):
         match self.map_dim:

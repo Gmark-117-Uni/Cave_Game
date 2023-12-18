@@ -11,46 +11,24 @@ class MissionControl():
 
         self.game = game
         self.settings = game.sim_settings
-        self.cave_gen = self.game.cave_gen
+        self.cave_gen = game.cave_gen
         self.cave_map = self.cave_gen.bin_map
-        self.surface = game.display
-        self.cave_png = Assets.Images['CAVE_MAP'].value
-        
-        # Save the borders of the cave
-        self.save_black_mask()
-        self.black_cave_png = Assets.Images['BLACK_CAVE_MAP'].value
         
         # Find a suitable start position
         self.set_initial_point()
         # Start mission
         self.start_mission()
-          
-                            
+
     def start_mission(self):
         # Create the drones 
         self.drone_manager = DroneManager(self.game, self.initial_point)
+        
         # Keep moving the drones
         while True:
-            self.drone_manager.set_start_point()
-           
-            
-    def save_black_mask (self):
-        # Load the CAVE_MAP image
-        cave_map = pygame.image.load(self.cave_png).convert_alpha()
-        # Create a new surface with per-pixel alpha
-        modified_cave_map = pygame.Surface(cave_map.get_size(), pygame.SRCALPHA)
-        # Iterate through each pixel and clear black pixels
-        for y in range(cave_map.get_height()):
-            for x in range(cave_map.get_width()):
-                # Get the color of the current pixel
-                pixel_color = cave_map.get_at((x, y))
-                if  pixel_color == (255, 255, 255, 255):  
-                    pixel_color = (0, 0, 0, 0)  
-                # Set the pixel color in the modified surface
-                modified_cave_map.set_at((x, y), pixel_color)
-        # Save the modified map
-        pygame.image.save(modified_cave_map,Assets.Images['BLACK_CAVE_MAP'].value)
-        
+            self.drone_manager.step()
+            #self.rover_manager.step()
+
+            pygame.display.update()
         
     # Among the starting positions of the worms, find one that is viable
     def set_initial_point(self):

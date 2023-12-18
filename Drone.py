@@ -1,31 +1,65 @@
 import pygame
 import Assets
+from ModeExploration import ModeExploration
+from ModeSearchNRescue import ModeSearchNRescue
 
 class Drone():
     def __init__(self, game, drone_rect, color, icon):
-        self.game  = game
-        self.rect  = drone_rect
-        self.pos   = drone_rect.center
-        self.color = color
-        self.icon  = icon
+        self.game        = game
+        self.settings    = game.sim_settings
+        self.rect        = drone_rect
+        self.radius      = 40   # TO BE CALCULATED BASED ON MAP DIMENSION
+        self.pos         = drone_rect.center
+        self.color       = color
+        self.alpha       = 150
+        self.icon        = icon
+        self.pos_history = [self.pos]
+        
+        # EXPLORATION = 0 / S&R = 1
+        self.explorer = ModeExploration(self.pos, self.settings[3]) if self.settings[0]==0 else ModeSearchNRescue(self.pos)
+        
+        # Calculate next position
+        self.next_pos = self.explorer.next_point()
+
+        self.blit_drone()
 
     # Calculate the next position of the drone
-    def move_drone(self, step):
-       self.next_pos = (self.pos[0] + step, self.pos[1])
+    def move(self):
+        self.pos_history.append(self.pos)
 
-       return self.next_pos
+        self.pos = self.next_pos
+
+        self.next_pos = self.explorer.next_point()
     
-    def draw_drone(self):
-        # Calculate the radius of the circle
-        radius = 40
-            
-        # Create a surface to draw the circle
-        circle_surface = pygame.Surface((radius * 2, radius * 2), pygame.SRCALPHA)
-        pygame.draw.circle(circle_surface, (*self.color, 128), (radius,radius), radius)   
-        # Blit the circle surface onto the game window
-        self.game.window.blit(circle_surface, (self.rect.centerx - radius, self.rect.centery - radius))
-        # Create drone
-        self.game.window.blit(self.icon, (self.rect.centerx - self.icon.get_width() / 2, self.rect.centery - self.icon.get_height() / 2))
+    def draw(self):
+        self.clear_old_icons()
+        self.draw_path()
+        self.blit_drone()
+
+    def draw_path(self):
+        self.floor_surf = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
+        pygame.draw.lines(self.floor_surf, (*self.color, int(2*self.alpha/3)), False, self.pos_history, self.radius)
+        # Blit the color surface onto the target surface
+        self.game.window.blit(self.floor_surf, (0,0))
+
+    def blit_drone(self):
+        # Create a surface to draw the circle (              dimensions, activate transprancy)
+        self.circle_surface = pygame.Surface((self.radius, self.radius),      pygame.SRCALPHA)
+                        # (            surface,                     color, center of the circle on the surface,      radius)
+        pygame.draw.circle(self.circle_surface, (*self.color, self.alpha),           (self.radius,self.radius), self.radius)
+
+        # Blit the circle at the initial point
+        self.game.window.blit(self.circle_surface, (self.pos[0],self.pos[1]))
         
-        # Update the display
-        pygame.display.update()
+        # The walls cover everything but the drone icon
+        cave_walls = pygame.image.load(Assets.Images['CAVE_WALLS'].value).convert_alpha()
+        self.game.window.blit(cave_walls, (0, 0))
+
+        # Blit the drone at the initial point
+        self.game.window.blit(self.icon, (self.pos[0],self.pos[1]))
+
+    def clear_old_icons(self):
+        # Load the CAVE_MAP image
+        cave_map = pygame.image.load(Assets.Images['CAVE_MAP'].value).convert_alpha()
+        # Draw the CAVE_MAP image onto the game window
+        self.game.window.blit(cave_map, (0, 0))  

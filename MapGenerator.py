@@ -36,6 +36,8 @@ class MapGenerator():
 
         # Save and display the map
         self.save_map()
+        self.extract_cave_walls()
+        self.extract_cave_floor()
         self.display_map()
     
 
@@ -399,6 +401,40 @@ class MapGenerator():
         # to avoid single pixel stalactites
         kernel_dim = 5
         self.bin_map = cv2.medianBlur(stalac_map, kernel_dim)
+
+    def extract_cave_walls(self):
+        # Load the CAVE_MAP image
+        cave_map = pygame.image.load(Assets.Images['CAVE_MAP'].value).convert_alpha()
+        # Create a new surface with per-pixel alpha
+        modified_cave_map = pygame.Surface(cave_map.get_size(), pygame.SRCALPHA)
+        # Iterate through each pixel and clear black pixels
+        for y in range(cave_map.get_height()):
+            for x in range(cave_map.get_width()):
+                # Get the color of the current pixel
+                pixel_color = cave_map.get_at((x, y))
+                if  pixel_color == (255, 255, 255, 255):  
+                    pixel_color = (0, 0, 0, 0)  
+                # Set the pixel color in the modified surface
+                modified_cave_map.set_at((x, y), pixel_color)
+        # Save the modified map
+        pygame.image.save(modified_cave_map, Assets.Images['CAVE_WALLS'].value)
+
+    def extract_cave_floor(self):
+        # Load the CAVE_MAP image
+        cave_map = pygame.image.load(Assets.Images['CAVE_MAP'].value).convert_alpha()
+        # Create a new surface with per-pixel alpha
+        modified_cave_map = pygame.Surface(cave_map.get_size(), pygame.SRCALPHA)
+        # Iterate through each pixel and clear black pixels
+        for y in range(cave_map.get_height()):
+            for x in range(cave_map.get_width()):
+                # Get the color of the current pixel
+                pixel_color = cave_map.get_at((x, y))
+                if  pixel_color == (0, 0, 0, 255):  
+                    pixel_color = (0, 0, 0, 0)  
+                # Set the pixel color in the modified surface
+                modified_cave_map.set_at((x, y), pixel_color)
+        # Save the modified map
+        pygame.image.save(modified_cave_map, Assets.Images['CAVE_FLOOR'].value)
 
 
     # _   _  _____  ___  _      ___  _____  ___  _____  ____  

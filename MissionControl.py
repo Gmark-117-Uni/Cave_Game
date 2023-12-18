@@ -7,7 +7,8 @@ import Assets
 class MissionControl():
     def __init__(self, game):
         # Set the seed from the settings
-        rand.seed(game.sim_settings[1])
+        rand.seed(game.sim_settings[2])
+
         self.game = game
         self.settings = game.sim_settings
         self.cave_gen = self.game.cave_gen

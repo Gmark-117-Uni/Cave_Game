@@ -29,7 +29,14 @@ class DroneManager():
         self.drone_colors = []
         # Radius of the circle
         self.radius = 40
-               
+        # Step 
+        self.step = int(self.radius/2)
+        
+        # Delay in milliseconds 
+        self.delay = 300  
+        
+        print('start mission control')
+        
         # Exit the simulation if the input is given
         while self.game.playing:
             self.game.check_events()
@@ -87,6 +94,21 @@ class DroneManager():
         self.clear_previous_drones()
         
         for i,drone_rect in enumerate(self.drone_rects):
+       ######################### Here call the methods to explore###################################
+       for i in range(self.num_drones):
+           pygame.time.delay(self.delay) 
+           point = self.start_point[i] 
+           self.tmp_next_point = (point[0]-i*10, point[1] - self.step)
+           self.next_point.append(self.tmp_next_point)
+
+
+    # Draw the drones and the colored area
+    def draw_drones(self):
+    
+        for i,drone_rect in enumerate(self.drone_rects):
+            pygame.time.delay(self.delay) 
+            # Clear the previuos drone
+            self.clear_previous_drones()
             # Current drone
             self.drone_nbr_tmp = i
             # Current drone rect
@@ -106,6 +128,10 @@ class DroneManager():
             
         # Update the display
         pygame.display.update()
+            # Create the drone
+            self.game.window.blit(self.drone, (drone_rect.centerx - self.drone.get_width() / 2, drone_rect.centery - self.drone.get_height() / 2))
+            # Update the display
+            pygame.display.update()
         
         if not hasattr(self, 'next_point'):
             # Initialize the next point
@@ -143,6 +169,12 @@ class DroneManager():
         if not hasattr(self, 'next_point'):
             # Blit the circle surface onto the game window
             self.game.window.blit(circle_surface, (self.drone_rect_tmp.centerx - self.radius, self.drone_rect_tmp.centery - self.radius))
+        # Blit the circle surface onto the game window
+        self.game.window.blit(circle_surface, (self.drone_rect_tmp.centerx - self.radius, self.drone_rect_tmp.centery - self.radius))
+        
+        # If is first there is no step
+        if not hasattr(self, 'next_point'):
+            return
         # If not take a step
         else:
             start_point_tmp = self.start_point[self.drone_nbr_tmp]
@@ -152,6 +184,14 @@ class DroneManager():
             # Blit the color surface onto the target surface
             self.game.window.blit(circle_surface, [start_point_tmp[0]-self.radius,start_point_tmp[1]-self.radius])
         
+            pygame.draw.line(circle_surface, (*color, 100), start_point_tmp, next_point_tmp, 2*self.radius)
+            # Blit the color surface onto the target surface
+            self.game.window.blit(circle_surface, [start_point_tmp[0]-self.radius,start_point_tmp[1]-self.radius], special_flags=pygame.BLEND_MAX)
+        # Save it on the map
+        pygame.image.save(self.game.window,Assets.Images['CAVE_MAP'].value)
+        # Add the black mask
+        black_cave_map = pygame.image.load(self.black_cave_png).convert_alpha()
+        self.game.window.blit(black_cave_map, (0, 0))
         
     def clear_previous_drones(self):
         # Load the CAVE_MAP image

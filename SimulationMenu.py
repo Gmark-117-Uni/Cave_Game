@@ -300,7 +300,8 @@ class SimulationMenu(Menu):
             case 1: map_dim = 'MEDIUM'
             case 2: map_dim = 'BIG'
         
-        settings = [map_dim,
+        settings = [self.mode,
+                    map_dim,
                     int(self.seed_input),
                     self.n_drones]
         

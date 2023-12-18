@@ -17,10 +17,10 @@ class MapGenerator():
         self.height   = Assets.FULLSCREEN_H
         
         # Set the seed
-        rand.seed(self.settings[1])
+        rand.seed(self.settings[2])
 
         # Initialise worm management settings
-        self.worm_inputs  = Assets.WormInputs[self.settings[0]].value
+        self.worm_inputs  = Assets.WormInputs[self.settings[1]].value
         self.proc_num     = 8
         self.targets      = list(map(int, np.linspace(0,self.proc_num-1,self.proc_num)))
         self.proc_counter = 0

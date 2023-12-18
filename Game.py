@@ -16,7 +16,7 @@ class Game():
         pygame.init()
         
         # If we run the game we are not necessary playing
-        self.running, self.playing, self.map_ready = True, False, False
+        self.running, self.playing = True, False
         
         # Initialise key flags to navigate in the menu
         self.UP_KEY,   self.DOWN_KEY, self.START_KEY = False, False, False
@@ -34,7 +34,7 @@ class Game():
     # Game loop function
     def game_loop(self):
         if self.playing:
-            # Settings : [Map Dimension, Seed, Drone Number]
+            # Settings : [Mode, Map Dimension, Seed, Drone Number]
             self.sim_settings  = self.simulation.get_sim_settings()
             # Generate the cave
             self.cave_gen = MapGenerator(self)

@@ -59,6 +59,7 @@ class Images(Enum):
         ROVER        = os.path.join(GAME_DIR, 'Assets', 'Images', 'rover_top.png')
         DRONE        = os.path.join(GAME_DIR, 'Assets', 'Images', 'drone_top.png')
         CAVE_MAP     = os.path.join(GAME_DIR, 'Assets', 'Cave_Map', 'map.png')
+        BLACK_CAVE_MAP = os.path.join(GAME_DIR, 'Assets', 'Cave_Map', 'black_map.png')
 
 class RectHandle(Enum):
         CENTER     = 'Center'

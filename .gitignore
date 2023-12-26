@@ -13,3 +13,4 @@ __pycache__/OptionsMenu.cpython-310.pyc
 __pycache__/Rover.cpython-310.pyc
 __pycache__/RoverManager.cpython-310.pyc
 __pycache__/SimulationMenu.cpython-310.pyc
+*.pyc

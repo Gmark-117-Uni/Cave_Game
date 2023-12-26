@@ -9,7 +9,7 @@ from Assets import sqr
 from multiprocessing import Process
 
 class MapGenerator():
-    def __init__(self, game):
+    def __init__(self, game, prefab=False):
         self.game     = game
         self.settings = game.sim_settings
         self.surface  = game.display
@@ -27,18 +27,20 @@ class MapGenerator():
         self.border_thck  = 50
         self.set_starts()
 
-        # Initialise the map and generate worms to eat it simultaneously
-        self.bin_map = np.ones([self.height,self.width])
-        self.dig_map(self.proc_num)
+        if not prefab:
+            # Initialise the map and generate worms to eat it simultaneously
+            self.bin_map = np.ones([self.height,self.width])
+            self.dig_map(self.proc_num)
 
-        # Perform image processing on the result
-        self.process_map()
+            # Perform image processing on the result
+            self.process_map()
 
-        # Save and display the map
-        self.save_map()
-        self.extract_cave_walls()
-        self.extract_cave_floor()
-        self.display_map()
+            # Save and display the map
+            self.save_map()
+            self.extract_cave_walls()
+            self.extract_cave_floor()
+        else:
+            self.bin_map = np.loadtxt(Assets.Images['CAVE_MATRIX'].value)
     
 
     # ____   ___   ____   ____  ___  _   _   ____ 
@@ -443,39 +445,14 @@ class MapGenerator():
     #| |_| |  | |   | | | |___  | |   | |   | | | |___  ___) |
     # \___/   |_|  |___||_____||___|  |_|  |___||_____||____/
 
-    # Dispaly the map in the window
-    def display_map(self): #, input_map=Assets.Images['CAVE_MAP'].value, x1=0, x2=Assets.FULLSCREEN_W-1, y1=0, y2=Assets.FULLSCREEN_H-1):
-        """ self.surface = self.game.to_maximised()
-
-        # Make the background black
-        self.surface.fill(Assets.Colors['BLACK'].value)
-
-        # WHITE ->  AIR  -> 0
-        # BLACK -> WALLS -> 1
-        for x in range(x1, x2+1):
-            for y in range(y1, y2+1):
-                match input_map[y][x]:
-                    case 0: pygame.draw.circle(self.surface, Assets.Colors['WHITE'].value, (x,y), 0)
-                    case 2: pygame.draw.circle(self.surface, Assets.Colors['RED'].value, (x,y), 0)
-                    
-        self.game.blit_screen() """
-
-        # Maximise the game window
-        self.surface = self.game.to_maximised()
-
-        # Set the map as the new background
-        background_image = pygame.image.load(Assets.Images['CAVE_MAP'].value)
-        self.surface.blit(background_image, (0, 0))
-        self.game.blit_screen()
-
     # Save the generated map
     def save_map(self):
         # Ensure the folder exists, otherwise create it
-        if not os.path.exists(os.path.join('Assets', 'Cave_Map')):
-            os.makedirs(os.path.join('Assets', 'Cave_Map'))
+        if not os.path.exists(os.path.join('Assets', 'Map')):
+            os.makedirs(os.path.join('Assets', 'Map'))
 
         # Change the current directory
-        directory = os.path.join(Assets.GAME_DIR, 'Assets', 'Cave_Map')
+        directory = os.path.join(Assets.GAME_DIR, 'Assets', 'Map')
         os.chdir(directory)
 
         # Extend values from [0,1] to [0,255]
@@ -483,4 +460,9 @@ class MapGenerator():
 
         # Save the map as a PNG image and change back the directory
         cv2.imwrite('map.png', byte_map)
+
+        # Save the map as a PNG image and change back the directory
+        np.savetxt('map_matrix.txt', self.bin_map)
+
+        # Set the current directory as the game directory again
         os.chdir(Assets.GAME_DIR)

@@ -15,9 +15,9 @@ class DroneManager():
         self.initial_point = point
 
         # Import the map
-        self.cave_gen = self.game.cave_gen
-        self.cave_map = self.cave_gen.bin_map
-        self.cave_png = Assets.Images['CAVE_MAP'].value
+        self.cave_gen   = self.game.cave_gen
+        self.map_matrix = self.cave_gen.bin_map
+        self.cave_png   = Assets.Images['CAVE_MAP'].value
 
         # Black mask for borders
         self.cave_walls_png = Assets.Images['CAVE_WALLS'].value
@@ -40,11 +40,15 @@ class DroneManager():
         drone_rect = self.drone_icon.get_rect()
         drone_rect.center = self.initial_point
         
+        # Populate the swarm
         self.drones = []
         for i in range(self.num_drones):
             self.drones.append(Drone(self.game, i, drone_rect, self.choose_color(), self.drone_icon))
 
     def step(self):
+        # Remove the drones drawn in the last positions
+        self.clear_old_icons()
+
         for i in range(self.num_drones):
             self.drones[i].move()
             self.drones[i].draw()
@@ -58,3 +62,11 @@ class DroneManager():
         self.colors.remove(random_color)
 
         return random_color.value
+    
+    # Remove the drones drawn in the last positions
+    def clear_old_icons(self):
+        # Load the CAVE_MAP image
+        cave_map = pygame.image.load(Assets.Images['CAVE_MAP'].value).convert_alpha()
+
+        # Draw the CAVE_MAP image onto the game window
+        self.game.window.blit(cave_map, (0, 0))

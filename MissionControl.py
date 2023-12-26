@@ -23,6 +23,9 @@ class MissionControl():
         # Create the drones 
         self.drone_manager = DroneManager(self.game, self.initial_point)
         
+        # Maximise the game window
+        self.game.display = self.game.to_maximised()
+        
         # Keep moving the drones
         while True:
             self.drone_manager.step()
@@ -40,5 +43,3 @@ class MissionControl():
             # Check if the point is white or black
             if self.cave_map[self.initial_point[1]][self.initial_point[0]] == 0:  # White
                 good_point = True
-                
-   

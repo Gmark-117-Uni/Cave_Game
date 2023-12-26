@@ -33,7 +33,6 @@ class Drone():
         self.next_pos = self.explorer.next_point(self.id)
     
     def draw(self):
-        self.clear_old_icons()
         self.draw_path()
         self.blit_drone()
 
@@ -58,9 +57,3 @@ class Drone():
 
         # Blit the drone at the initial point
         self.game.window.blit(self.icon, self.pos)
-
-    def clear_old_icons(self):
-        # Load the CAVE_MAP image
-        cave_map = pygame.image.load(Assets.Images['CAVE_MAP'].value).convert_alpha()
-        # Draw the CAVE_MAP image onto the game window
-        self.game.window.blit(cave_map, (0, 0))  

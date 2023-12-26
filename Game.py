@@ -37,7 +37,7 @@ class Game():
             # Settings : [Mode, Map Dimension, Seed, Drone Number]
             self.sim_settings  = self.simulation.get_sim_settings()
             # Generate the cave
-            self.cave_gen = MapGenerator(self)
+            self.cave_gen = MapGenerator(self, True)
             # Prep and Start the mission
             self.mission_control = MissionControl(self)
 

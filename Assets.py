@@ -32,6 +32,7 @@ class Colors(Enum):
         EUCALYPTUS   = (95, 133, 117)
         GREENDARK    = (117,132,104)
         RED          = (255,0,0)
+        GREEN        = (51,255,51)
 
 class DroneColors(Enum):
         PINK         = (255,51,153)

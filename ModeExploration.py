@@ -1,18 +1,14 @@
 import pygame
 
 class ModeExploration:
-    def __init__(self,start_point, num_drones):
-        self.start_point = start_point
+    def __init__(self, start_pos, num_drones):
+        self.pos = start_pos
         self.num_drones = num_drones
-        # Delay in milliseconds 
-        self.delay = 300
+        self.delay = 300  # Milliseconds
         
-    def next_point(self):
-        self.next_point = []  
-        for i in range(self.num_drones):
-            pygame.time.delay(self.delay) 
-            point = self.start_point[i] 
-            self.tmp_next_point = (point[0]-i*10, point[1] - 10)
-            self.next_point.append(self.tmp_next_point)
+    def next_point(self, id):
+        pygame.time.delay(self.delay)
 
-        return self.next_point
+        self.pos = (self.pos[0] - (id+1)*10, self.pos[1] - 10)
+
+        return self.pos

@@ -24,7 +24,7 @@ class DroneManager():
         
         # Set drone icone
         self.drone_icon = pygame.image.load(Assets.Images['DRONE'].value)
-        self.drone = pygame.transform.scale(self.drone_icon, (70,70))
+        self.drone_icon = pygame.transform.scale(self.drone_icon, (70,70))
 
         # Extract settings
         self.num_drones = self.settings[3]
@@ -41,8 +41,8 @@ class DroneManager():
         drone_rect.center = self.initial_point
         
         self.drones = []
-        for _ in range(self.num_drones):
-            self.drones.append(Drone(self.game, drone_rect, self.choose_color(), self.drone_icon))
+        for i in range(self.num_drones):
+            self.drones.append(Drone(self.game, i, drone_rect, self.choose_color(), self.drone_icon))
 
     def step(self):
         for i in range(self.num_drones):

@@ -89,21 +89,34 @@ class Menu():
     def loading_screen(self, proc_counter, text='Loading...'):
         match proc_counter:
             case 0:
-                self.blit_loading(text[:-3])
+                self.blit_loading([text[:-3]])
             case 2:
-                self.blit_loading(text[:-2])
+                self.blit_loading([text[:-2]])
             case 4:
-                self.blit_loading(text[:-1])
+                self.blit_loading([text[:-1]])
             case 6:
-                self.blit_loading(text)
-    
-    # Print loading text
-    def blit_loading(self, text='Loading...'):
+                self.blit_loading([text])
+
+    def blit_loading(self, text=['Loading...']):
         self.game.display.blit(self.dark_background,(0,0))
-        self.draw_text(text, 100,
-                        self.mid_w,
-                        self.mid_h,
-                        Assets.Fonts['BIG'].value,
-                        Assets.Colors['WHITE'].value,
-                        Assets.RectHandle['CENTER'].value)
+
+        lines = len(text)
+        line_offset = 100
+        decenter_offset = 50
+
+        if lines%2==0:
+            upper_lines = int((lines/2))
+            first_line_y = self.mid_h - decenter_offset - line_offset*(upper_lines - 1)
+        else:
+            upper_lines = int(((lines - 1)/2))
+            first_line_y = self.mid_h - line_offset*upper_lines
+
+        for line in range(lines):
+                self.draw_text(text[line], 100,
+                       self.mid_w,
+                       first_line_y + line_offset*line, 
+                       Assets.Fonts['BIG'].value,
+                       Assets.Colors['WHITE'].value,
+                       Assets.RectHandle['CENTER'].value)
+
         self.game.blit_screen()

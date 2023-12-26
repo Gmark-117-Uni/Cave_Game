@@ -4,9 +4,10 @@ from ModeExploration import ModeExploration
 from ModeSearchNRescue import ModeSearchNRescue
 
 class Drone():
-    def __init__(self, game, drone_rect, color, icon):
+    def __init__(self, game, id, drone_rect, color, icon):
         self.game        = game
         self.settings    = game.sim_settings
+        self.id          = id
         self.rect        = drone_rect
         self.radius      = 40   # TO BE CALCULATED BASED ON MAP DIMENSION
         self.pos         = drone_rect.center
@@ -15,11 +16,11 @@ class Drone():
         self.icon        = icon
         self.pos_history = [self.pos]
         
-        # EXPLORATION = 0 / S&R = 1
+        # EXPLORATION is 0 / Search&Rescue is 1
         self.explorer = ModeExploration(self.pos, self.settings[3]) if self.settings[0]==0 else ModeSearchNRescue(self.pos)
         
         # Calculate next position
-        self.next_pos = self.explorer.next_point()
+        self.next_pos = self.explorer.next_point(self.id)
 
         self.blit_drone()
 
@@ -29,7 +30,7 @@ class Drone():
 
         self.pos = self.next_pos
 
-        self.next_pos = self.explorer.next_point()
+        self.next_pos = self.explorer.next_point(self.id)
     
     def draw(self):
         self.clear_old_icons()
@@ -49,14 +50,14 @@ class Drone():
         pygame.draw.circle(self.circle_surface, (*self.color, self.alpha),           (self.radius,self.radius), self.radius)
 
         # Blit the circle at the initial point
-        self.game.window.blit(self.circle_surface, (self.pos[0],self.pos[1]))
+        self.game.window.blit(self.circle_surface, self.pos)
         
         # The walls cover everything but the drone icon
         cave_walls = pygame.image.load(Assets.Images['CAVE_WALLS'].value).convert_alpha()
         self.game.window.blit(cave_walls, (0, 0))
 
         # Blit the drone at the initial point
-        self.game.window.blit(self.icon, (self.pos[0],self.pos[1]))
+        self.game.window.blit(self.icon, self.pos)
 
     def clear_old_icons(self):
         # Load the CAVE_MAP image

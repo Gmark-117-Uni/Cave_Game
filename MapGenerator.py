@@ -382,7 +382,7 @@ class MapGenerator():
 
     # Perform image processing of the raw map
     def process_map(self):
-        self.game.curr_menu.blit_loading('Growing stalactites...')
+        self.game.curr_menu.blit_loading(['Waiting for', 'stalactites to grow...'])
 
         # Define the kernel dimensions and prep the map matrix
         kernel_dim = self.worm_inputs[1] - 1

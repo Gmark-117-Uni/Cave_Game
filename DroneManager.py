@@ -12,7 +12,7 @@ class DroneManager():
         self.settings = game.sim_settings
 
         # Get the initial point
-        self.initial_point = point
+        self.init_point = point
 
         # Import the map
         self.cave_gen   = self.game.cave_gen
@@ -24,7 +24,7 @@ class DroneManager():
         
         # Set drone icone
         self.drone_icon = pygame.image.load(Assets.Images['DRONE'].value)
-        self.drone_icon = pygame.transform.scale(self.drone_icon, (70,70))
+        self.drone_icon = pygame.transform.scale(self.drone_icon, (50,50))
 
         # Extract settings
         self.num_drones = self.settings[3]
@@ -35,23 +35,24 @@ class DroneManager():
 
         self.build_drones()
     
+    # Instantiate the swarm of drones as a list
     def build_drones(self):
-        # Create a drone rect and set the center to the start position
-        drone_rect = self.drone_icon.get_rect()
-        drone_rect.center = self.initial_point
-        
         # Populate the swarm
         self.drones = []
         for i in range(self.num_drones):
-            self.drones.append(Drone(self.game, i, drone_rect, self.choose_color(), self.drone_icon))
+            self.drones.append(Drone(self.game, i, self.init_point, self.choose_color(), self.drone_icon))
 
+    # 
     def step(self):
         # Remove the drones drawn in the last positions
-        self.clear_old_icons()
+        self.clear_floor()
 
+        # Move all drones by one step
         for i in range(self.num_drones):
             self.drones[i].move()
-            self.drones[i].draw()
+        
+        # Update the map
+        self.draw()
 
     # Function to get a random color with semi-transparency
     def choose_color(self):     
@@ -64,9 +65,26 @@ class DroneManager():
         return random_color.value
     
     # Remove the drones drawn in the last positions
-    def clear_old_icons(self):
+    def clear_floor(self):
         # Load the CAVE_MAP image
         cave_map = pygame.image.load(Assets.Images['CAVE_MAP'].value).convert_alpha()
 
         # Draw the CAVE_MAP image onto the game window
         self.game.window.blit(cave_map, (0, 0))
+    
+    # Blit the cave walls
+    def draw_walls(self, first_time=True):
+        if first_time:
+            # The walls cover everything but the drone icon
+            cave_walls = pygame.image.load(Assets.Images['CAVE_WALLS'].value).convert_alpha()
+            self.game.window.blit(cave_walls, (0, 0))
+
+    # Draw everything in layers: (Lowest layer) 0 -> 3 (Highest layer)
+    def draw(self):
+        for i in range(4):
+            for j in range(self.num_drones):
+                match i:
+                    case 0: self.drones[j].draw_path()
+                    case 1: self.drones[j].draw_vision()
+                    case 2: self.draw_walls() if j==0 else self.draw_walls(False)
+                    case 3: self.drones[j].draw_icon()

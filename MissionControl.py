@@ -19,6 +19,7 @@ class MissionControl():
         # Start mission
         self.start_mission()
 
+    # Mission loop
     def start_mission(self):
         # Create the drones 
         self.drone_manager = DroneManager(self.game, self.initial_point)

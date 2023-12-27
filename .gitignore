@@ -1,17 +1,1 @@
-__pycache__/Assets.cpython-310.pyc
-__pycache__/CreditsMenu.cpython-310.pyc
-__pycache__/Drone.cpython-310.pyc
-__pycache__/DroneManager.cpython-310.pyc
-__pycache__/Game.cpython-310.pyc
-__pycache__/MainMenu.cpython-310.pyc
-__pycache__/MapGenerator.cpython-310.pyc
-__pycache__/Menu.cpython-310.pyc
-__pycache__/MissionControl.cpython-310.pyc
-__pycache__/ModeExploration.cpython-310.pyc
-__pycache__/ModeSearchNRescue.cpython-310.pyc
-__pycache__/OptionsMenu.cpython-310.pyc
-__pycache__/Rover.cpython-310.pyc
-__pycache__/RoverManager.cpython-310.pyc
-__pycache__/SimulationMenu.cpython-310.pyc
-*.pyc
 *.pyc

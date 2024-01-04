@@ -1,8 +1,11 @@
 import random as rand
-from DroneManager import DroneManager
-from RoverManager import RoverManager
 import pygame
+import time
 import Assets
+from DroneManager import DroneManager
+#from RoverManager import RoverManager
+from ModeExploration import ModeExploration
+from ModeSearchNRescue import ModeSearchNRescue
 
 class MissionControl():
     def __init__(self, game):
@@ -11,24 +14,35 @@ class MissionControl():
 
         self.game = game
         self.settings = game.sim_settings
-        self.cave_gen = game.cave_gen
-        self.cave_map = self.cave_gen.bin_map
+        self.cartographer = game.cartographer
+        self.map_matrix = self.cartographer.bin_map
+        self.surface  = game.display
         
         # Find a suitable start position
         self.set_initial_point()
+
+        # Instantiate explorer
+        # EXPLORATION is 0 / Search&Rescue is 1
+        match self.settings[0]:
+            case 0: self.explorer = ModeExploration(self.map_matrix, self.surface)
+            case 1: self.explorer = ModeSearchNRescue(self.map_matrix, self.surface)
+
         # Start mission
         self.start_mission()
 
     # Mission loop
     def start_mission(self):
-        # Create the drones 
-        self.drone_manager = DroneManager(self.game, self.initial_point)
-        
         # Maximise the game window
         self.game.display = self.game.to_maximised()
+
+        # Create the drones 
+        self.drone_manager = DroneManager(self.game, self.initial_point, self.explorer)
         
-        # Keep moving the drones
-        while True:
+        pygame.display.update()
+        time.sleep(1)
+
+        # Keep moving the drones until the explorer says otherwise
+        while not self.explorer.mission_completed():
             self.drone_manager.step()
             #self.rover_manager.step()
 
@@ -40,7 +54,8 @@ class MissionControl():
         while not good_point:  
             # Take one of the initial points of the worms as initial point for the drone
             i = rand.randint(0,3)
-            self.initial_point = (self.cave_gen.worm_x[i],self.cave_gen.worm_y[i])
+            self.initial_point = (self.cartographer.worm_x[i],self.cartographer.worm_y[i])
+
             # Check if the point is white or black
-            if self.cave_map[self.initial_point[1]][self.initial_point[0]] == 0:  # White
+            if self.map_matrix[self.initial_point[1]][self.initial_point[0]] == 0:  # White
                 good_point = True

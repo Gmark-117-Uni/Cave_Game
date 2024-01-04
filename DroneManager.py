@@ -7,16 +7,17 @@ import Assets
 from Drone import Drone
 
 class DroneManager():
-    def __init__(self, game, point):
+    def __init__(self, game, point, explorer):
         self.game = game
         self.settings = game.sim_settings
+        self.explorer = explorer
 
         # Get the initial point
         self.init_point = point
 
         # Import the map
-        self.cave_gen   = self.game.cave_gen
-        self.map_matrix = self.cave_gen.bin_map
+        self.cartographer   = self.game.cartographer
+        self.map_matrix = self.cartographer.bin_map
         self.cave_png   = Assets.Images['CAVE_MAP'].value
 
         # Black mask for borders
@@ -28,21 +29,22 @@ class DroneManager():
 
         # Extract settings
         self.num_drones = self.settings[3]
-        self.mode = self.settings[0]
 
         # List to store drone colors
         self.colors = list(Assets.DroneColors)
 
         self.build_drones()
+        self.clear_floor()
+        self.draw()
     
     # Instantiate the swarm of drones as a list
     def build_drones(self):
         # Populate the swarm
         self.drones = []
         for i in range(self.num_drones):
-            self.drones.append(Drone(self.game, i, self.init_point, self.choose_color(), self.drone_icon))
+            self.drones.append(Drone(self.game, i, self.init_point, self.choose_color(), self.drone_icon, self.explorer))
 
-    # 
+    # Move and display the drones
     def step(self):
         # Remove the drones drawn in the last positions
         self.clear_floor()
@@ -88,3 +90,6 @@ class DroneManager():
                     case 1: self.drones[j].draw_vision()
                     case 2: self.draw_walls() if j==0 else self.draw_walls(False)
                     case 3: self.drones[j].draw_icon()
+    
+    def merge_maps(self):
+        pass

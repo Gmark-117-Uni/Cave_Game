@@ -4,25 +4,21 @@ from ModeExploration import ModeExploration
 from ModeSearchNRescue import ModeSearchNRescue
 
 class Drone():
-    def __init__(self, game, id, init_pos, color, icon):
+    def __init__(self, game, id, init_pos, color, icon, explorer):
         self.game         = game
         self.settings     = game.sim_settings
+        self.explorer     = explorer
         self.id           = id
         self.radius       = 40   # TO BE CALCULATED BASED ON MAP DIMENSION
+        self.step         = int(self.radius/2)
         self.pos          = init_pos
         self.color        = color
         self.alpha        = 150
         self.icon         = icon
         self.pos_history  = []
         
-        # EXPLORATION is 0 / Search&Rescue is 1
-        self.explorer = ModeExploration(self.pos) if self.settings[0]==0 else ModeSearchNRescue(self.pos)
-        
         # Calculate next position
-        self.next_pos = self.explorer.next_point(self.id)
-
-        self.draw_vision()
-        self.draw_icon()
+        self.next_pos = self.explorer.next_point(self.id, self.pos, self.step)
 
     # Calculate the next position of the drone
     def move(self):
@@ -30,7 +26,7 @@ class Drone():
 
         self.pos = self.next_pos
 
-        self.next_pos = self.explorer.next_point(self.id)
+        self.next_pos = self.explorer.next_point(self.id, self.pos, self.step)
 
     # Draw the explored area of the drone
     def draw_path(self):
@@ -62,3 +58,6 @@ class Drone():
     # Calculate the topleft based on the object dimensions so that the drawing is centered
     def center_drawing(self, width, height):
         return (self.pos[0] - width/2, self.pos[1] - height/2)
+    
+    def share_map(self):
+        pass

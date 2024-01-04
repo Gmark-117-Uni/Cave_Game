@@ -10,7 +10,7 @@ GAME_DIR = os.path.dirname(os.path.abspath(__file__))
 # Display dimensions
 DISPLAY_W = 1200
 DISPLAY_H = 750
-FULLSCREEN_W = 1920 - 5 # root.winfo_screenwidth() - 5
+FULLSCREEN_W = root.winfo_screenwidth() - 5
 FULLSCREEN_H = root.winfo_screenheight() - 70
 
 # Lists for menu voices and settings

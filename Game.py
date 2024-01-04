@@ -31,15 +31,29 @@ class Game():
         self.simulation      = SimulationMenu(self)
         self.curr_menu       = self.main_menu
 
-    # Game loop function
+
+    #   ____     _     __  __  _____   _       ___    ___   ____  
+    #  / ___|   / \   |  \/  || ____| | |     / _ \  / _ \ |  _ \ 
+    # | |  _   / _ \  | |\/| ||  _|   | |    | | | || | | || |_) |
+    # | |_| | / ___ \ | |  | || |___  | |___ | |_| || |_| ||  __/ 
+    #  \____|/_/   \_\|_|  |_||_____| |_____| \___/  \___/ |_|    
+    
+    # Run the simulation
     def game_loop(self):
         if self.playing:
             # Settings : [Mode, Map Dimension, Seed, Drone Number]
             self.sim_settings  = self.simulation.get_sim_settings()
             # Generate the cave
-            self.cave_gen = MapGenerator(self, True)
+            self.cartographer = MapGenerator(self, True)
             # Prep and Start the mission
             self.mission_control = MissionControl(self)
+
+
+    #  __  __     _     _   _     _      ____  _____      ___  _   _  ____   _   _  _____  ____  
+    # |  \/  |   / \   | \ | |   / \    / ___|| ____|    |_ _|| \ | ||  _ \ | | | ||_   _|/ ___|
+    # | |\/| |  / _ \  |  \| |  / _ \  | |  _ |  _|       | | |  \| || |_) || | | |  | |  \___ \
+    # | |  | | / ___ \ | |\  | / ___ \ | |_| || |___      | | | |\  ||  __/ | |_| |  | |   ___) |
+    # |_|  |_|/_/   \_\|_| \_|/_/   \_\ \____||_____|    |___||_| \_||_|     \___/   |_|  |____/
 
    # Check player inputs
     def check_events(self):
@@ -73,7 +87,14 @@ class Game():
     def reset_keys(self):
         self.UP_KEY,   self.DOWN_KEY, self.START_KEY = False, False, False
         self.BACK_KEY, self.LEFT_KEY, self.RIGHT_KEY = False, False, False
-    
+
+
+    #  __  __     _     _   _     _      ____  _____      ____   ___  ____   ____   _         _    __   __
+    # |  \/  |   / \   | \ | |   / \    / ___|| ____|    |  _ \ |_ _|/ ___| |  _ \ | |       / \   \ \ / /
+    # | |\/| |  / _ \  |  \| |  / _ \  | |  _ |  _|      | | | | | | \___ \ | |_) || |      / _ \   \ V /
+    # | |  | | / ___ \ | |\  | / ___ \ | |_| || |___     | |_| | | |  ___) ||  __/ | |___  / ___ \   | |
+    # |_|  |_|/_/   \_\|_| \_|/_/   \_\ \____||_____|    |____/ |___||____/ |_|    |_____|/_/   \_\  |_|
+
     # Update the display
     def blit_screen(self):
         self.window.blit(self.display, (0, 0))

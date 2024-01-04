@@ -86,17 +86,29 @@ class Menu():
         return display_flag
     
     # Display the loading screen
-    def loading_screen(self, proc_counter, text='Loading...'):
+    # Add a dot when two more processes are completed
+    def loading_screen(self, proc_counter):
+        text1 = 'Digging...'
+        text2 = ['Waiting for', 'stalactites to grow...']
         match proc_counter:
             case 0:
-                self.blit_loading([text[:-3]])
+                self.blit_loading([text1[:-3]])
+            case 1:
+                self.blit_loading([text1[:-2]])
             case 2:
-                self.blit_loading([text[:-2]])
-            case 4:
-                self.blit_loading([text[:-1]])
+                self.blit_loading([text1[:-1]])
+            case 3:
+                self.blit_loading([text1])
+            case 5:
+                self.blit_loading([text2[0], text2[1][:-3]])
             case 6:
-                self.blit_loading([text])
+                self.blit_loading([text2[0], text2[1][:-2]])
+            case 7:
+                self.blit_loading([text2[0], text2[1][:-1]])
+            case 8:
+                self.blit_loading(text2)
 
+    # Display a static loading screen accounting for multiline texts
     def blit_loading(self, text=['Loading...']):
         self.game.display.blit(self.dark_background,(0,0))
 

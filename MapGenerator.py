@@ -54,7 +54,7 @@ class MapGenerator():
     def dig_map(self, proc_num):
         proc_list = []
         
-        self.game.curr_menu.loading_screen(self.proc_counter, 'Digging...')
+        self.game.curr_menu.loading_screen(self.proc_counter)
 
         for i in range(proc_num):
             proc_list.append(Process(target=self.worm(self.worm_x[i], self.worm_y[i], *(self.worm_inputs), i)))
@@ -86,7 +86,7 @@ class MapGenerator():
         self.connect_rooms(x, y, step, stren, id)
         
         self.proc_counter += 1
-        self.game.curr_menu.loading_screen(self.proc_counter, 'Digging...')
+        self.game.curr_menu.loading_screen(self.proc_counter)
 
 
     # _____   ___    ___   _      ____  
@@ -312,7 +312,7 @@ class MapGenerator():
         deg_dir    = (rad_dir if rad_dir >= 0 else (2*math.pi + rad_dir)) * 180 / math.pi
         target_dir = int(deg_dir - 90 if deg_dir>=90 else deg_dir + 270)
 
-        # Randomically change direction to maintain realism
+        # Randomically (50% chance) change direction to maintain realism
         if not rand.randint(0,1):
             target_dir = (target_dir + rand.randint(-90,90)) % 360
 
@@ -384,7 +384,7 @@ class MapGenerator():
 
     # Perform image processing of the raw map
     def process_map(self):
-        self.game.curr_menu.blit_loading(['Waiting for', 'stalactites to grow...'])
+        self.game.curr_menu.blit_loading(['Breeding bats...'])
 
         # Define the kernel dimensions and prep the map matrix
         kernel_dim = self.worm_inputs[1] - 1

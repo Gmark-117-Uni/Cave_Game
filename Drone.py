@@ -4,29 +4,45 @@ from ModeExploration import ModeExploration
 from ModeSearchNRescue import ModeSearchNRescue
 
 class Drone():
-    def __init__(self, game, id, init_pos, color, icon, explorer):
+    def __init__(self, game, id, start_pos, color, icon, explorer):
         self.game         = game
         self.settings     = game.sim_settings
         self.explorer     = explorer
         self.id           = id
         self.radius       = 40   # TO BE CALCULATED BASED ON MAP DIMENSION
-        self.step         = int(self.radius/2)
-        self.pos          = init_pos
+        self.step         = int(self.radius/8)
+        self.pos          = start_pos
         self.color        = color
         self.alpha        = 150
         self.icon         = icon
         self.pos_history  = []
         
         # Calculate next position
-        self.next_pos = self.explorer.next_point(self.id, self.pos, self.step)
+        self.next_pos, self.unexplored_dirs = self.explorer.next_pos(self.id, self.pos, self.step)
 
     # Calculate the next position of the drone
     def move(self):
+        # Record old positions
         self.pos_history.append(self.pos)
-
+        
+        # Update position
         self.pos = self.next_pos
 
-        self.next_pos = self.explorer.next_point(self.id, self.pos, self.step)
+        # Calculate next position and record unexplored directions for current position
+        self.next_pos, self.unexplored_dirs = self.explorer.next_pos(self.id, self.pos, self.step)
+    
+    def get_pos_history(self):
+        pass
+
+    def update_explored_map(self):
+        pass
+
+
+#  ____   ____      _    __        __ ___  _   _   ____ 
+# |  _ \ |  _ \    / \   \ \      / /|_ _|| \ | | / ___|
+# | | | || |_) |  / _ \   \ \ /\ / /  | | |  \| || |  _
+# | |_| ||  _ <  / ___ \   \ V  V /   | | | |\  || |_| |
+# |____/ |_| \_\/_/   \_\   \_/\_/   |___||_| \_| \____|
 
     # Draw the explored area of the drone
     def draw_path(self):
@@ -59,5 +75,3 @@ class Drone():
     def center_drawing(self, width, height):
         return (self.pos[0] - width/2, self.pos[1] - height/2)
     
-    def share_map(self):
-        pass

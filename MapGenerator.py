@@ -5,7 +5,7 @@ import numpy as np
 import cv2
 import pygame
 import Assets
-from Assets import sqr
+from Assets import sqr, next_cell_coords
 from multiprocessing import Process
 
 class MapGenerator():
@@ -43,11 +43,11 @@ class MapGenerator():
             self.bin_map = np.loadtxt(Assets.Images['CAVE_MATRIX'].value)
     
 
-    # ____   ___   ____   ____  ___  _   _   ____ 
-    #|  _ \ |_ _| / ___| / ___||_ _|| \ | | / ___|
-    #| | | | | | | |  _ | |  _  | | |  \| || |  _ 
-    #| |_| | | | | |_| || |_| | | | | |\  || |_| |
-    #|____/ |___| \____| \____||___||_| \_| \____|
+    #  ____   ___   ____   ____  ___  _   _   ____ 
+    # |  _ \ |_ _| / ___| / ___||_ _|| \ | | / ___|
+    # | | | | | | | |  _ | |  _  | | |  \| || |  _ 
+    # | |_| | | | | |_| || |_| | | | | |\  || |_| |
+    # |____/ |___| \____| \____||___||_| \_| \____|
 
     # Create multiple worms and let them eat the map simultaneously
     # while displaying the loading screen
@@ -80,7 +80,7 @@ class MapGenerator():
             
             self.border_control(x1, x2, y1, y2, stren)
             
-            x, y = self.next_cell_coords(x, y, step, self.dir)
+            x, y = next_cell_coords(x, y, step, self.dir)
             life -= 1
 
         self.connect_rooms(x, y, step, stren, id)
@@ -89,11 +89,11 @@ class MapGenerator():
         self.game.curr_menu.loading_screen(self.proc_counter)
 
 
-    # _____   ___    ___   _      ____  
-    #|_   _| / _ \  / _ \ | |    / ___| 
-    #  | |  | | | || | | || |    \___ \ 
-    #  | |  | |_| || |_| || |___  ___) |
-    #  |_|   \___/  \___/ |_____||____/ 
+    #  _____   ___    ___   _      ____  
+    # |_   _| / _ \  / _ \ | |    / ___| 
+    #   | |  | | | || | | || |    \___ \ 
+    #   | |  | |_| || |_| || |___  ___) |
+    #   |_|   \___/  \___/ |_____||____/ 
 
     # Set starting positions for the worms
     def set_starts(self):
@@ -145,108 +145,6 @@ class MapGenerator():
         if new_dir:
             self.dir = rand.randint(0,360)
 
-    # Map the given direction to the possible pixels,
-    # given the length of the step
-    def map_direction(self, step_len, dir):
-        # Number of possible cells for a given step length
-        targets = step_len * 8
-
-        # The circle is divided into N sectors based on the number of targets
-        sector_len = 360 / targets
-
-        # The sectors are shifted backwards to align with the positions of the cells
-        sector_offset = math.floor(sector_len / 2)
-
-        # Sectors must be aligned with pixels positions and shifted back
-        # Therefore the second half of a sector ends up in the next one
-        corrected_dir = dir + sector_offset
-
-        # Sector numbering starts at 0
-        target_cell = math.floor((corrected_dir % 360)/ sector_len)
-
-        return target_cell, targets
-
-    # Calculate the coordinates of the pixel for the next step
-    def next_cell_coords(self, x, y, step_len, dir):
-        target_cell, targets = self.map_direction(step_len, dir)
-
-        cases = Assets.Axes(step_len)
-        
-        # Check on axes and diagonals
-        match target_cell:
-            case cases.up:
-                y -= step_len
-                return x, y
-            case cases.diag1:
-                x += step_len
-                y -= step_len
-                return x, y
-            case cases.right:
-                x += step_len
-                return x, y
-            case cases.diag4:
-                x += step_len
-                y += step_len
-                return x, y
-            case cases.down:
-                y += step_len
-                return x, y
-            case cases.diag3:
-                x -= step_len
-                y += step_len
-                return x, y
-            case cases.left:
-                x -= step_len
-                return x, y
-            case cases.diag2:
-                x -= step_len
-                y -= step_len
-                return x, y
-
-        # Check on pixels between axes and diagonals
-        if (step_len-1)!=0:
-            for i in cases.list:
-                if i==0:
-                    check = range(cases.list[-1] + 1, targets)
-                else:
-                    check = range(cases.list[cases.list.index(i)-1]+1, i)
-                
-                for j in check:
-                    if target_cell==j:
-                        match i:
-                            case cases.up:
-                                x -= targets - j
-                                y -= step_len
-                                return x, y
-                            case cases.diag1:
-                                x += j
-                                y -= step_len
-                                return x, y
-                            case cases.right:
-                                x += step_len
-                                y -= i - j
-                                return x, y
-                            case cases.diag4:
-                                x += step_len
-                                y += i - j
-                                return x, y
-                            case cases.down:
-                                x += i - j
-                                y += step_len
-                                return x, y
-                            case cases.diag3:
-                                x -= j - i + step_len
-                                y += step_len
-                                return x, y
-                            case cases.left:
-                                x -= step_len
-                                y += i - j
-                                return x, y
-                            case cases.diag2:
-                                x -= step_len
-                                y -= j - i + step_len
-                                return x, y
-
     # Choose the shape of the eaten part
     def choose_brush(self, x1, y1, x2, y2, stren):
         # Choose randomly between the brushes
@@ -273,11 +171,11 @@ class MapGenerator():
                 return True
 
     
-    # _____  ___  _   _  ___  ____   _   _  ___  _   _   ____ 
-    #|  ___||_ _|| \ | ||_ _|/ ___| | | | ||_ _|| \ | | / ___|
-    #| |_    | | |  \| | | | \___ \ | |_| | | | |  \| || |  _
-    #|  _|   | | | |\  | | |  ___) ||  _  | | | | |\  || |_| |
-    #|_|    |___||_| \_||___||____/ |_| |_||___||_| \_| \____|
+    #  _____  ___  _   _  ___  ____   _   _  ___  _   _   ____ 
+    # |  ___||_ _|| \ | ||_ _|/ ___| | | | ||_ _|| \ | | / ___|
+    # | |_    | | |  \| | | | \___ \ | |_| | | | |  \| || |  _
+    # |  _|   | | | |\  | | |  ___) ||  _  | | | | |\  || |_| |
+    # |_|    |___||_| \_||___||____/ |_| |_||___||_| \_| \____|
 
     # Ensure there are no inacessible rooms
     def connect_rooms(self, x, y, step, stren, id):
@@ -302,7 +200,7 @@ class MapGenerator():
             
             self.border_control(x1, x2, y1, y2, stren, new_dir=False)
             
-            x, y = self.next_cell_coords(x, y, step, self.dir)
+            x, y = next_cell_coords(x, y, step, self.dir)
             life -= 1
 
     # Set the course for the starting point of the closest worm
@@ -344,11 +242,11 @@ class MapGenerator():
         return x_min, x_max, y_min, y_max, target
 
 
-    #  ____  _      _____     _     _   _  ___  _   _   ____ 
-    # / ___|| |    | ____|   / \   | \ | ||_ _|| \ | | / ___|
-    #| |    | |    |  _|    / _ \  |  \| | | | |  \| || |  _
-    #| |___ | |___ | |___  / ___ \ | |\  | | | | |\  || |_| |
-    # \____||_____||_____|/_/   \_\|_| \_||___||_| \_| \____|
+    #   ____  _      _____     _     _   _  ___  _   _   ____ 
+    #  / ___|| |    | ____|   / \   | \ | ||_ _|| \ | | / ___|
+    # | |    | |    |  _|    / _ \  |  \| | | | |  \| || |  _
+    # | |___ | |___ | |___  / ___ \ | |\  | | | | |\  || |_| |
+    #  \____||_____||_____|/_/   \_\|_| \_||___||_| \_| \____|
 
     # Remove isolated caves
     def remove_hermit_caves(self,image):
@@ -376,11 +274,11 @@ class MapGenerator():
         return cleaned_image
 
 
-    # ____    ___   ____   _____         ____   ____    ___    ____  _____  ____   ____   ___  _   _   ____ 
-    #|  _ \  / _ \ / ___| |_   _|       |  _ \ |  _ \  / _ \  / ___|| ____|/ ___| / ___| |_ _|| \ | | / ___|
-    #| |_) || | | |\___ \   | |   _____ | |_) || |_) || | | || |    |  _|  \___ \ \___ \  | | |  \| || |  _
-    #|  __/ | |_| | ___) |  | |  |_____||  __/ |  _ < | |_| || |___ | |___  ___) | ___) | | | | |\  || |_| |
-    #|_|     \___/ |____/   |_|         |_|    |_| \_\ \___/  \____||_____||____/ |____/ |___||_| \_| \____|
+    #  ____    ___   ____   _____         ____   ____    ___    ____  _____  ____   ____   ___  _   _   ____ 
+    # |  _ \  / _ \ / ___| |_   _|       |  _ \ |  _ \  / _ \  / ___|| ____|/ ___| / ___| |_ _|| \ | | / ___|
+    # | |_) || | | |\___ \   | |   _____ | |_) || |_) || | | || |    |  _|  \___ \ \___ \  | | |  \| || |  _
+    # |  __/ | |_| | ___) |  | |  |_____||  __/ |  _ < | |_| || |___ | |___  ___) | ___) | | | | |\  || |_| |
+    # |_|     \___/ |____/   |_|         |_|    |_| \_\ \___/  \____||_____||____/ |____/ |___||_| \_| \____|
 
     # Perform image processing of the raw map
     def process_map(self):
@@ -439,11 +337,11 @@ class MapGenerator():
         pygame.image.save(modified_cave_map, Assets.Images['CAVE_FLOOR'].value)
 
 
-    # _   _  _____  ___  _      ___  _____  ___  _____  ____  
-    #| | | ||_   _||_ _|| |    |_ _||_   _||_ _|| ____|/ ___|
-    #| | | |  | |   | | | |     | |   | |   | | |  _|  \___ \
-    #| |_| |  | |   | | | |___  | |   | |   | | | |___  ___) |
-    # \___/   |_|  |___||_____||___|  |_|  |___||_____||____/
+    #  _   _  _____  ___  _      ___  _____  ___  _____  ____  
+    # | | | ||_   _||_ _|| |    |_ _||_   _||_ _|| ____|/ ___|
+    # | | | |  | |   | | | |     | |   | |   | | |  _|  \___ \
+    # | |_| |  | |   | | | |___  | |   | |   | | | |___  ___) |
+    #  \___/   |_|  |___||_____||___|  |_|  |___||_____||____/
 
     # Save the generated map
     def save_map(self):

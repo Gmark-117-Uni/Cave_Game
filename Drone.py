@@ -18,7 +18,7 @@ class Drone():
         self.pos_history  = []
         
         # Calculate next position
-        self.next_pos, self.unexplored_dirs = self.explorer.next_pos(self.id, self.pos, self.step)
+        self.next_pos, self.unexplored_dirs = self.explorer.next_pos(self.pos, self.step)
 
     # Calculate the next position of the drone
     def move(self):
@@ -29,10 +29,10 @@ class Drone():
         self.pos = self.next_pos
 
         # Calculate next position and record unexplored directions for current position
-        self.next_pos, self.unexplored_dirs = self.explorer.next_pos(self.id, self.pos, self.step)
+        self.next_pos, self.unexplored_dirs = self.explorer.next_pos(self.pos, self.step)
     
     def get_pos_history(self):
-        pass
+        return self.pos_history
 
     def update_explored_map(self):
         pass

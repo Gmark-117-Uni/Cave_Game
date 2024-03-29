@@ -1,4 +1,5 @@
 import os
+import sys
 import pygame
 import Assets
 from MainMenu import MainMenu
@@ -55,15 +56,15 @@ class Game():
     # | |  | | / ___ \ | |\  | / ___ \ | |_| || |___      | | | |\  ||  __/ | |_| |  | |   ___) |
     # |_|  |_|/_/   \_\|_| \_|/_/   \_\ \____||_____|    |___||_| \_||_|     \___/   |_|  |____/
 
-   # Check player inputs
+    # Check player inputs
     def check_events(self):
         # Get the input
         for event in pygame.event.get():
             match event.type:
                 # If the player clicks the x on top of the window exit the game
                 case pygame.QUIT:
-                    self.running, self.playing, self.map_ready = False, False, False
-                    self.curr_menu.run_display = False
+                    pygame.quit()
+                    sys.exit()
                 
                 # If the player clicks something on the keyboard
                 # they can go up or down with the arrows or

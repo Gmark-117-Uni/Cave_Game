@@ -27,4 +27,4 @@ class RoverManager():
         self.num_rovers = math.ceil(self.settings[3]/4)
 
         # List to store drone colors
-        self.colors = [Assets.Colors['GREY'].value, Assets.Colors['BROWN'].value]
+        self.colors = [Assets.Colors['GREY'].value, Assets.Colors['RED'].value]

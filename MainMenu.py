@@ -35,7 +35,7 @@ class MainMenu(Menu):
         self.cursor_y = [self.states_y[0],    # Start
                          self.states_y[1],    # Options
                          self.states_y[2],    # Credits
-                         self.states_y[3],]   # Exit
+                         self.states_y[3]]   # Exit
         
         self.cursor_pos = [self.cursor_x[0], self.cursor_y[0]]
 

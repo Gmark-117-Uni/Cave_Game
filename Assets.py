@@ -51,9 +51,9 @@ class Colors(Enum):
         WHITE        = (255, 255, 255)
         EUCALYPTUS   = ( 95, 133, 117)
         GREENDARK    = (117, 132, 104)
+        YELLOW       = (255, 255,  51)
         RED          = (255,   0,   0)
         GREEN        = ( 51, 255,  51)
-        BROWN        = (165,  42,  42)
         GREY         = (112, 128, 144)
 
 class DroneColors(Enum):
@@ -62,9 +62,9 @@ class DroneColors(Enum):
         BLUE         = (  0,   0, 153)
         L_BLUE       = ( 51, 255, 255)
         GREEN        = ( 51, 255,  51)
-        YELLOW       = (255, 255,  51)
         ORANGE       = (255, 128,   0)
         RED          = (255,   0,   0)
+        BROWN        = (165,  42,  42)
         
 class Fonts(Enum):
         BIG          = os.path.join(GAME_DIR, 'Assets', 'Fonts', 'Cave-Stone.ttf')  

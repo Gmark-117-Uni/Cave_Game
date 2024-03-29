@@ -272,7 +272,7 @@ class SimulationMenu(Menu):
                 return
 
         # Reset the flag if no keys are pressed
-        if not any(pygame.key.get_pressed()):
+        if len(pygame.key.get_pressed())==0:
             self.number_input = False
 
     # Save selected options

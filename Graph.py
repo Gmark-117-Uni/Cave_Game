@@ -1,35 +1,41 @@
 import pygame
-from Assets import sqr
+from Assets import sqr, wall_hit
 
 class Graph():
-    def __init__(self, surface, x_start, y_start, explorer):
-        self.surface  = surface
-        self.explorer = explorer
+    def __init__(self, x_start, y_start, cave):
+        self.cave = cave
         self.x = []
         self.y = []
         self.parent = []
+        self.pos = []
         self.is_explored = []
 
         self.x.append(x_start)
         self.y.append(y_start)
         self.parent.append(0)
-    
-    def draw(self, color):
-        pass
+        self.pos.append((x_start,y_start))
+        self.is_explored.append(False)
     
     def add_node(self, id, x, y):
         self.x.insert(id, x)
         self.y.insert(id, y)
+        self.pos.insert(id, (x,y))
+        self.is_explored.insert(id, False)
 
     def remove_node(self, id):
         self.x.pop(id)
         self.y.pop(id)
+        self.pos.pop(id)
+        self.is_explored.pop(id)
 
     def add_edge(self, id_child, id_parent):
         self.parent.insert(id_child, id_parent)
 
     def remove_edge(self, id_child):
         self.parent.pop(id_child)
+    
+    def explored(self, id):
+        self.is_explored[id] = True
     
     def num_of_nodes(self):
         return len(self.x)
@@ -56,7 +62,7 @@ class Graph():
         error = dx + dy
 
         while True:
-            if self.explorer.wall_hit((x1, y1)):
+            if wall_hit(self.cave, (x1, y1)):
                 return True
 
             if x1==x2 and y1==y2: return False
@@ -70,10 +76,10 @@ class Graph():
                 error += dx
                 y1 += sy
     
-    def connect(self, n1, n2):
+    def connect(self, surface, n1, n2):
         x1, y1 = self.x[n1], self.y[n1]
         x2, y2 = self.x[n2], self.y[n2]
-        if self.cross_obs(self.surface, x1, y1, x2, y2):
+        if self.cross_obs(surface, x1, y1, x2, y2):
             self.remove_node(n2)
             return False
         else:

@@ -8,10 +8,10 @@ import Assets
 from Drone import Drone
 
 class DroneManager():
-    def __init__(self, game, start_point, explorer):
+    def __init__(self, game, start_point):
         self.game     = game
         self.settings = game.sim_settings
-        self.explorer = explorer
+        self.mission  = self.settings[0]
 
         # Get the initial point
         self.start_point = start_point
@@ -35,7 +35,7 @@ class DroneManager():
         self.colors = list(Assets.DroneColors)
 
         # Set node id counter
-        self.node_id = 1
+        self.node_id = 0
 
         # Build the drones and show them and the map at step 0
         self.build_drones()
@@ -47,18 +47,19 @@ class DroneManager():
         # Populate the swarm
         self.drones = []
         for i in range(self.num_drones):
-            self.drones.append(Drone(self.game, i, self.start_point, self.choose_color(), self.drone_icon, self.explorer))
+            self.drones.append(Drone(self.game, i, self.start_point, self.choose_color(), self.drone_icon, self.map_matrix))
 
     # Move and display the drones
     def step(self):
         # Remove the drones drawn in the last positions
         self.draw_clean_map()
 
-        self.node_id += self.num_drones
+        # Update node id
+        self.node_id += 1
 
         # Move all drones by one step
         for i in range(self.num_drones):
-            self.drones[i].move(self.node_id + i)
+            self.drones[i].move(self.node_id)
         
         # Update the map
         self.draw()

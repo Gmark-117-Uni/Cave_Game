@@ -5,8 +5,6 @@ import sys
 import Assets
 from DroneManager import DroneManager
 from RoverManager import RoverManager
-from ModeExploration import ModeExploration
-from ModeSearchNRescue import ModeSearchNRescue
 
 class MissionControl():
     def __init__(self, game):
@@ -18,22 +16,21 @@ class MissionControl():
         self.cartographer = game.cartographer
         self.map_matrix   = self.cartographer.bin_map
 
+        # Mission settings
+        # Exploration is 0 / Search&Rescue is 1
+        self.mission   = self.settings[0]
+        self.completed = False
+
         # Maximise the game window
         self.game.display = self.game.to_maximised()
         
-        # Instantiate explorer
-        # EXPLORATION is 0 / Search&Rescue is 1
-        match self.settings[0]:
-            case 0: self.explorer = ModeExploration(self.map_matrix, self.game.display)
-            case 1: self.explorer = ModeSearchNRescue(self.map_matrix, self.game.display)
-
         # Find a suitable start position
         self.start_point = None
         self.set_start_point()
 
         # Create the drones and the rovers
-        self.drone_manager = DroneManager(self.game, self.start_point, self.explorer)
-        self.rover_manager = RoverManager(self.game, self.start_point, self.explorer)
+        self.drone_manager = DroneManager(self.game, self.start_point)
+        #self.rover_manager = RoverManager(self.game, self.start_point)
 
         # Show the map and the robots at step 0 for 1 second
         pygame.display.update()
@@ -44,8 +41,8 @@ class MissionControl():
 
     # Mission loop
     def start_mission(self):
-        # Keep moving the drones until the explorer says otherwise
-        while not self.explorer.mission_completed():
+        # Keep moving the drones until the mission is completed
+        while not self.completed:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -60,7 +57,7 @@ class MissionControl():
     # Among the starting positions of the worms, find one that is viable
     def set_start_point(self):
         # While point is BLACK or not initialised
-        while (self.start_point is None) or self.explorer.wall_hit(self.start_point):
+        while self.start_point is None or Assets.wall_hit(self.map_matrix, self.start_point):
             # Take one of the initial points of the worms as initial point for the drone
             i = rand.randint(0,3)
             self.start_point = (self.cartographer.worm_x[i],self.cartographer.worm_y[i])

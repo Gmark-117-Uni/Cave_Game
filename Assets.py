@@ -228,3 +228,9 @@ def next_cell_coords(x, y, step_len, dir):
                                                 x -= step_len
                                                 y -= j - i + step_len
                                                 return x, y
+
+def wall_hit(map_matrix, pos):
+        if map_matrix[pos[1]][pos[0]]==1:
+                return True
+
+        return False

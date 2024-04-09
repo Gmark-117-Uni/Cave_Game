@@ -1,34 +1,54 @@
 import pygame
 import random as rand
+import time
 from Assets import next_cell_coords
 from Graph import Graph
 
 class Drone():
-    def __init__(self, game, id, start_pos, color, icon, cave):
+    def __init__(self, game, manager, id, start_pos, color, icon, cave):
         self.game         = game
         self.settings     = game.sim_settings
         self.cave         = cave
+        self.manager      = manager
+
         self.id           = id
         self.radius       = 39   # TO BE CALCULATED BASED ON MAP DIMENSION
         self.step         = int(self.radius) + 1
-        self.pos          = start_pos
+
         self.color        = color
         self.alpha        = 150
         self.icon         = icon
-        self.node_history = []
         self.floor_surf   = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
+        
+        self.node_history = []
+        self.pos          = start_pos
         self.graph        = Graph(*start_pos, cave)
+
+        self.steps_back   = 0
 
     # Calculate the next position of the drone
     def move(self, node_id):
         # Record id of current position to the history
         self.node_history.append(self.graph.pos.index(self.pos))
 
-        if not self.find_new_node(node_id):
-            raise ValueError('Cul de sac!')
-            #self.climb_tree()
+        node_found = False
+        while not node_found:
+            try:
+                # Find all valid directions
+                dirs, targets = self.find_new_node()
+            except AssertionError:
+                # If there are none, climb the graph
+                self.retrace()
+                # Show the steps of the retracing process
+                self.draw_retracing()
+            else:
+                # Otherwise move in one of the valid directions
+                node_found = self.explore(node_id, dirs, targets)
+                self.steps_back = 0
+                # Clean screen after showing the retracing steps
+                self.manager.draw_cave()
     
-    def find_new_node(self, node_id):
+    def find_new_node(self):
         # Calculate next position and record unexplored directions for current position
         all_dirs = list(range(360))    # How many directions can it take
         targets  = []
@@ -42,45 +62,50 @@ class Drone():
             # Find the target pixel in that direction
             targets[i][0], targets[i][1] = next_cell_coords(*self.pos, self.step, i*dir_res)
 
-            # Add the target to the graph
-            self.graph.add_node(node_id, *targets[i])
-
             # If the target is a white pixel:
-            if self.graph.is_free(self.floor_surf):
-                # Remove it from the graph and keep it among the possible directions
-                self.graph.remove_node(-1)
-            else:
-                # Otherwise add the direction to the blacklist
+            if not self.graph.is_valid(self.floor_surf, self.pos, (*targets[i],)):
+                # Add the direction to the blacklist
                 dir_blacklist.append(i)
 
         # Filter the directions through the blacklist
-        dirs = [dir for dir in all_dirs if dir not in dir_blacklist]
-
+        valid_dirs = [dir for dir in all_dirs if dir not in dir_blacklist]
+        
         # If there is at least one dir left to be explored
-        if dirs:
-            # Choose a random valid direction and add the target to the graph
-            chosen_dir = rand.choice(dirs)
-            self.graph.add_node(node_id, *targets[chosen_dir])
-            self.graph.add_edge(node_id, node_id-1)
-            self.pos = *targets[chosen_dir],
+        assert valid_dirs
 
-            # If it's the last direction mark the node as explored
-            if not dirs:
-                self.graph.explored(node_id)
+        return valid_dirs, targets
 
-            return True
-            
-        # If there are no dirs left with white pixels just beyond the edge of the vision circle
-        return False
+    def explore(self, node_id, dirs, targets):
+        # Choose a random valid direction and add the target to the graph
+        chosen_dir = rand.choice(dirs)
+        self.graph.add_node(node_id, *targets[chosen_dir])
+        self.graph.add_edge(node_id, self.node_history[-1])
+        self.pos = *targets[chosen_dir],
+        dirs.remove(chosen_dir)
+
+        # If it's the last direction mark the node as explored
+        if not dirs:
+            self.graph.node_explored(node_id)
+        
+        return True
     
-    def climb_tree(self):
-        pygame.event.wait(10)
+    def retrace(self):
+        # If there are no dirs left with white pixels just beyond the edge of the vision circle
+        # retrace the tree to find the last node with explorable directions
+        self.steps_back += 1
+
+        self.pos = self.graph.pos[self.node_history[-self.steps_back*2]]
+        self.node_history.append(self.graph.pos.index(self.pos))
     
     def mission_completed(self):
         # THIS METHOD WILL BE MOVED TO THE MANAGERS
         # Check all nodes for white pixels around them
         # If there are none, MISSION COMPLETED
-        pass
+        for explored in self.graph.explored:
+            if not explored:
+                return False
+            
+        return True
     
     def get_pos_history(self):
         pos_hist = []
@@ -92,23 +117,26 @@ class Drone():
         pass
 
 
-#  ____   ____      _    __        __ ___  _   _   ____ 
-# |  _ \ |  _ \    / \   \ \      / /|_ _|| \ | | / ___|
-# | | | || |_) |  / _ \   \ \ /\ / /  | | |  \| || |  _
-# | |_| ||  _ <  / ___ \   \ V  V /   | | | |\  || |_| |
-# |____/ |_| \_\/_/   \_\   \_/\_/   |___||_| \_| \____|
+#  ____   ____      _  __        __ ___  _   _   ____ 
+# |  _ \ |  _ \    / \ \ \      / /|_ _|| \ | | / ___|
+# | | | || |_) |  / _ \ \ \ /\ / /  | | |  \| || |  _
+# | |_| ||  _ <  / ___ \ \ V  V /   | | | |\  || |_| |
+# |____/ |_| \_\/_/   \_\ \_/\_/   |___||_| \_| \____|
 
     # Draw the explored area of the drone
     def draw_path(self):
         # Draw a circle on every position in history
-        for i in self.node_history:
-            pygame.draw.circle(self.floor_surf, (*self.color, int(2*self.alpha/3)), self.graph.pos[i], self.radius)
+        for i in self.graph.pos:
+            pygame.draw.circle(self.floor_surf, (*self.color, int(2*self.alpha/3)), i, self.radius)
         # Draw a node on every position in history
-        for i in self.node_history:
-            if self.graph.is_free(self.floor_surf):
-                pygame.draw.circle(self.floor_surf, (*self.color, 255), self.graph.pos[i], 5)
-                if i>0 and not self.graph.cross_obs(*(self.graph.pos[i]), *(self.graph.pos[i-1])):
-                    pygame.draw.line(self.floor_surf, (*self.color, 255), self.graph.pos[i], self.graph.pos[i-1], 2)
+        for i in range(len(self.node_history)):
+            pygame.draw.circle(self.floor_surf, (*self.color, 255),
+                               self.graph.pos[self.node_history[i]], 5)
+            # Draw an edge between positions given the order of visitation
+            if i>0:
+                pygame.draw.line(self.floor_surf, (*self.color, 255),
+                                 self.graph.pos[self.node_history[i]],
+                                 self.graph.pos[self.node_history[i-1]], 2)
 
         # Blit the color surface onto the target surface
         self.game.window.blit(self.floor_surf, (0,0))
@@ -133,3 +161,8 @@ class Drone():
     def center_drawing(self, width, height):
         return (self.pos[0] - width/2, self.pos[1] - height/2)
     
+    def draw_retracing(self):
+        self.manager.draw_cave()
+        self.manager.draw()
+        pygame.display.update()
+        time.sleep(0.25)

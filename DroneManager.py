@@ -25,8 +25,10 @@ class DroneManager():
         self.cave_walls_png = pygame.image.load(Assets.Images['CAVE_WALLS'].value).convert_alpha()
         
         # Set drone icon
+        icon_size = self.get_icon_dim()
+        
         self.drone_icon = pygame.image.load(Assets.Images['DRONE'].value)
-        self.drone_icon = pygame.transform.scale(self.drone_icon, (30,30))
+        self.drone_icon = pygame.transform.scale(self.drone_icon, icon_size)
 
         # Extract settings
         self.num_drones = 1#self.settings[3]
@@ -39,7 +41,7 @@ class DroneManager():
 
         # Build the drones and show them and the map at step 0
         self.build_drones()
-        self.draw_clean_map()
+        self.draw_cave()
         self.draw()
     
     # Instantiate the swarm of drones as a list
@@ -47,12 +49,12 @@ class DroneManager():
         # Populate the swarm
         self.drones = []
         for i in range(self.num_drones):
-            self.drones.append(Drone(self.game, i, self.start_point, self.choose_color(), self.drone_icon, self.map_matrix))
+            self.drones.append(Drone(self.game, self, i, self.start_point, self.choose_color(), self.drone_icon, self.map_matrix))
 
     # Move and display the drones
     def step(self):
         # Remove the drones drawn in the last positions
-        self.draw_clean_map()
+        self.draw_cave()
 
         # Update node id
         self.node_id += 1
@@ -66,16 +68,21 @@ class DroneManager():
 
     # Function to get a random color with semi-transparency
     def choose_color(self):     
-        # Choose a random color from the list
+        # Choose a random color from the list, then remove it
         random_color = rand.choice(self.colors)
-
-        # Remove the chosen color from the list
         self.colors.remove(random_color)
 
         return random_color.value
     
+    # Return the dimension of the drone icon given the map dimension
+    def get_icon_dim(self):
+        match self.settings[1]:
+            case 'SMALL' : return Assets.drone_icon_options[0]
+            case 'MEDIUM': return Assets.drone_icon_options[1]
+            case 'BIG'   : return Assets.drone_icon_options[2]
+    
     # Remove the drones drawn in the last positions
-    def draw_clean_map(self):
+    def draw_cave(self):
         # Draw the CAVE_MAP image onto the game window
         self.game.window.blit(self.cave_png, (0, 0))
     
@@ -90,8 +97,8 @@ class DroneManager():
         for i in range(4):
             for j in range(self.num_drones):
                 match i:
-                    case 0: self.drones[j].draw_path()
-                    case 1: self.drones[j].draw_vision()
+                    case 0: self.drones[j].draw_vision()
+                    case 1: self.drones[j].draw_path()
                     case 2: self.draw_walls() if j==0 else self.draw_walls(False)
                     case 3: self.drones[j].draw_icon()
     

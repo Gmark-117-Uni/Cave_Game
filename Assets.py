@@ -22,12 +22,14 @@ FULLSCREEN_W = root.winfo_screenwidth() - 5
 FULLSCREEN_H = root.winfo_screenheight() - 70
 
 # Lists for menu voices and settings
-main_menu_states     = ['Start', 'Options', 'Credits', 'Exit']
-options_menu_states  = ['Game Volume', 'Music Volume', 'Button Sound', 'Back']
-sim_menu_states      = ['Mode', 'Map Dimension', 'Seed', 'Drones', 'Back', 'Start Simulation']
-mode_options         = ["Cave exploration", "Rescue mission"]
-map_options          = ["Small", "Medium", "Big"]
-seed                 = [     5,       19,    837]
+main_menu_states    = ['Start', 'Options', 'Credits', 'Exit']
+options_menu_states = ['Game Volume', 'Music Volume', 'Button Sound', 'Back']
+sim_menu_states     = ['Mode', 'Map Dimension', 'Seed', 'Drones', 'Back', 'Start Simulation']
+mode_options        = ["Cave exploration", "Rescue mission"]
+map_options         = ["Small", "Medium", "Big"]
+vision_options      = [     39,       19,     4]
+drone_icon_options  = [(30,30),  (10,10), (1,1)]
+seed                = [      5,       19,   837]
 
 # Map Generator Inputs
 step     = 10

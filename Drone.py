@@ -13,14 +13,16 @@ class Drone():
 
         self.id           = id
         self.radius       = 39   # TO BE CALCULATED BASED ON MAP DIMENSION
-        self.step         = int(self.radius) + 1
+        self.step         = 10
 
         self.color        = color
         self.alpha        = 150
         self.icon         = icon
         self.floor_surf   = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
+        self.delay        = self.manager.delay
         
-        self.node_history = []
+        self.node_history = [] # DEPRECATED
+        self.border       = []
         self.pos          = start_pos
         self.graph        = Graph(*start_pos, cave)
 
@@ -35,7 +37,9 @@ class Drone():
         while not node_found:
             try:
                 # Find all valid directions
-                dirs, targets = self.find_new_node()
+                dirs, valid_targets = self.find_new_node()
+                # Update borders
+                self.update_borders()
             except AssertionError:
                 # If there are none, climb the graph
                 self.retrace()
@@ -43,7 +47,7 @@ class Drone():
                 self.draw_retracing()
             else:
                 # Otherwise move in one of the valid directions
-                node_found = self.explore(node_id, dirs, targets)
+                node_found = self.explore(node_id, dirs, valid_targets)
                 self.steps_back = 0
                 # Clean screen after showing the retracing steps
                 self.manager.draw_cave()
@@ -60,7 +64,7 @@ class Drone():
         dir_blacklist = []
         for i in all_dirs:
             # Find the target pixel in that direction
-            targets[i][0], targets[i][1] = next_cell_coords(*self.pos, self.step, i*dir_res)
+            targets[i][0], targets[i][1] = next_cell_coords(*self.pos, self.radius + 1, i*dir_res)
 
             # If the target is a white pixel:
             if not self.graph.is_valid(self.floor_surf, self.pos, (*targets[i],)):
@@ -68,24 +72,30 @@ class Drone():
                 dir_blacklist.append(i)
 
         # Filter the directions through the blacklist
-        valid_dirs = [dir for dir in all_dirs if dir not in dir_blacklist]
+        valid_dirs    = [dir for dir in all_dirs if dir not in dir_blacklist]
+        valid_targets = [targets[valid_dir] for valid_dir in valid_dirs]
         
         # If there is at least one dir left to be explored
         assert valid_dirs
 
-        return valid_dirs, targets
+        return valid_dirs, valid_targets
 
-    def explore(self, node_id, dirs, targets):
+    def explore(self, node_id, dirs, valid_targets):
         # Choose a random valid direction and add the target to the graph
         chosen_dir = rand.choice(dirs)
-        self.graph.add_node(node_id, *targets[chosen_dir])
+        target = next_cell_coords(*self.pos, self.step, chosen_dir)
+        self.graph.add_node(node_id, *target)
         self.graph.add_edge(node_id, self.node_history[-1])
-        self.pos = *targets[chosen_dir],
+        self.pos = target
         dirs.remove(chosen_dir)
+        # Add unexplored pixels to the border list (ONLY ONE TIME EACH)
+        list(set(self.border.extend(valid_targets)))
 
+        # DEPRECATED
         # If it's the last direction mark the node as explored
         if not dirs:
             self.graph.node_explored(node_id)
+        # END OF DEPRECATION
         
         return True
     
@@ -97,15 +107,25 @@ class Drone():
         self.pos = self.graph.pos[self.node_history[-self.steps_back*2]]
         self.node_history.append(self.graph.pos.index(self.pos))
     
+    def update_borders(self):
+        for i in self.border:
+            if pygame.Surface.get_at(self.floor_surf, i)[:3] == self.color:
+                self.border.remove(i)
+    
     def mission_completed(self):
         # THIS METHOD WILL BE MOVED TO THE MANAGERS
         # Check all nodes for white pixels around them
         # If there are none, MISSION COMPLETED
+
+        # DEPRECATED
         for explored in self.graph.explored:
             if not explored:
                 return False
             
         return True
+        # END OF DEPRECATION
+    
+        # Check if there are border nodes anymore
     
     def get_pos_history(self):
         pos_hist = []
@@ -129,14 +149,14 @@ class Drone():
         for i in self.graph.pos:
             pygame.draw.circle(self.floor_surf, (*self.color, int(2*self.alpha/3)), i, self.radius)
         # Draw a node on every position in history
-        for i in range(len(self.node_history)):
+        '''for i in range(len(self.node_history)):
             pygame.draw.circle(self.floor_surf, (*self.color, 255),
                                self.graph.pos[self.node_history[i]], 5)
             # Draw an edge between positions given the order of visitation
             if i>0:
                 pygame.draw.line(self.floor_surf, (*self.color, 255),
                                  self.graph.pos[self.node_history[i]],
-                                 self.graph.pos[self.node_history[i-1]], 2)
+                                 self.graph.pos[self.node_history[i-1]], 2)'''
 
         # Blit the color surface onto the target surface
         self.game.window.blit(self.floor_surf, (0,0))
@@ -165,4 +185,4 @@ class Drone():
         self.manager.draw_cave()
         self.manager.draw()
         pygame.display.update()
-        time.sleep(0.25)
+        time.sleep(self.delay)

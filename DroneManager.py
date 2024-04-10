@@ -12,6 +12,7 @@ class DroneManager():
         self.game     = game
         self.settings = game.sim_settings
         self.mission  = self.settings[0]
+        self.delay    = 0.1
 
         # Get the initial point
         self.start_point = start_point

@@ -52,7 +52,11 @@ class MissionControl():
             #self.rover_manager.step()
 
             pygame.display.update()
-            time.sleep(0.25)
+            time.sleep(self.drone_manager.delay)
+
+            '''if (self.drone_manager.node_id % 10) == 0:
+                name = "Screenshot_" + str(self.drone_manager.node_id) + ".png"
+                pygame.image.save(self.game.window, name)'''
         
     # Among the starting positions of the worms, find one that is viable
     def set_start_point(self):

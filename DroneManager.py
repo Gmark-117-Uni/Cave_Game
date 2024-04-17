@@ -12,7 +12,7 @@ class DroneManager():
         self.game     = game
         self.settings = game.sim_settings
         self.mission  = self.settings[0]
-        self.delay    = 0.1
+        self.delay    = 0
 
         # Get the initial point
         self.start_point = start_point
@@ -37,9 +37,6 @@ class DroneManager():
         # List to store drone colors
         self.colors = list(Assets.DroneColors)
 
-        # Set node id counter
-        self.node_id = 0
-
         # Build the drones and show them and the map at step 0
         self.build_drones()
         self.draw_cave()
@@ -57,12 +54,9 @@ class DroneManager():
         # Remove the drones drawn in the last positions
         self.draw_cave()
 
-        # Update node id
-        self.node_id += 1
-
         # Move all drones by one step
         for i in range(self.num_drones):
-            self.drones[i].move(self.node_id)
+            self.drones[i].move()
         
         # Update the map
         self.draw()

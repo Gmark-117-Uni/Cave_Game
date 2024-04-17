@@ -16,6 +16,9 @@ class MissionControl():
         self.cartographer = game.cartographer
         self.map_matrix   = self.cartographer.bin_map
 
+        # Take screenshots every 10 steps
+        self.timelapse = False
+
         # Mission settings
         # Exploration is 0 / Search&Rescue is 1
         self.mission   = self.settings[0]
@@ -54,9 +57,9 @@ class MissionControl():
             pygame.display.update()
             time.sleep(self.drone_manager.delay)
 
-            '''if (self.drone_manager.node_id % 10) == 0:
+            if self.timelapse and (self.drone_manager.node_id % 10) == 0:
                 name = "Screenshot_" + str(self.drone_manager.node_id) + ".png"
-                pygame.image.save(self.game.window, name)'''
+                pygame.image.save(self.game.window, name)
         
     # Among the starting positions of the worms, find one that is viable
     def set_start_point(self):

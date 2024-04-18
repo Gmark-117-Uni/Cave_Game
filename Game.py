@@ -10,7 +10,7 @@ from MapGenerator import MapGenerator
 from MissionControl import MissionControl
 
 class Game():
-    def __init__(self): 
+    def __init__(self):
         os.environ['SDL_VIDEO_CENTERED'] = '1'
 
         # Initialise pygame features
@@ -101,7 +101,7 @@ class Game():
         self.window.blit(self.display, (0, 0))
         pygame.display.update()
         self.reset_keys()
-
+    
     # Maximise the window
     def to_maximised(self):
         # Choose and set window dimensions

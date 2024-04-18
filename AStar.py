@@ -1,6 +1,7 @@
-import pygame
 from operator import attrgetter
-from Assets import wall_hit
+import math
+import pygame
+from Assets import wall_hit, check_pixel_color, Colors
 
 class Node():
     def __init__(self, pos, parent=None):
@@ -20,13 +21,20 @@ class Node():
         return self.pos == other.pos
 
 class AStar():
-    def __init__(self, surface, cave_matrix, color):
+    def __init__(self, surface, cave_matrix, color, game):
+        self.game    = game
         self.surface = surface
         self.cave    = cave_matrix
         self.color   = color
+        self.astar_surf = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
 
         self.open   = []
         self.closed = []
+
+        # Surrounding pixels
+        self.pos_modifiers = [(-1,-1), (0,-1), (1,-1),
+                              (-1, 0),         (1, 0),
+                              (-1, 1), (0, 1), (1, 1),]
 
     def clear(self):
         # When a path is found reset the variables
@@ -61,6 +69,18 @@ class AStar():
             
             # Let the nodes adjacent to the current one be its children
             self.find_children(curr_node)
+
+            # Show the A* algorithm at work
+            for node in self.open:
+                pygame.Surface.set_at(self.astar_surf, node.pos, (*Colors.RED.value, 255))
+            for node in self.closed:
+                pygame.Surface.set_at(self.astar_surf, node.pos, (*Colors.GREENDARK.value, 255))
+            
+            pygame.draw.circle(self.astar_surf, (*Colors.BLUE.value, 255), self.goal_node.pos, 5, 1)
+            pygame.draw.circle(self.astar_surf, (*Colors.YELLOW.value, 255), self.goal_node.pos, 1, 1)
+
+            self.game.window.blit(self.astar_surf, (0,0))
+            pygame.display.flip()
     
     def backtrack(self, curr_node):
         path = []
@@ -78,12 +98,7 @@ class AStar():
     def find_children(self, curr_node):
         children = []
 
-        # Surrounding pixels
-        pos_modifiers = [(-1,-1), (0,-1), (1,-1),
-                         (-1, 0),         (1, 0),
-                         (-1, 1), (0, 1), (1, 1),]
-
-        for i in pos_modifiers:
+        for i in self.pos_modifiers:
             # Calculate the child position
             child_pos = (curr_node.pos[0] + i[0], curr_node.pos[1] + i[1])
 
@@ -117,7 +132,14 @@ class AStar():
     
     # Check if the child is valid (explored) and is not a wall
     def is_valid(self, pos):
-        if (pygame.Surface.get_at(self.surface, pos)[:3] == self.color
-            and not wall_hit(self.cave, pos)):
+        if ((check_pixel_color(self.surface, pos, Colors.WHITE.value, is_not=True)
+             or self.in_white_border(pos))
+             and not wall_hit(self.cave, pos)):
                 return True
+        
         return False
+    
+    def in_white_border(self, pos):
+        # Allow A* to explore white pixels n steps beyond the colored area
+        n = 2
+        return True if math.dist(pos, self.goal_node.pos) <= n else False

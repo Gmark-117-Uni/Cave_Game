@@ -68,3 +68,10 @@ class MissionControl():
             # Take one of the initial points of the worms as initial point for the drone
             i = rand.randint(0,3)
             self.start_point = (self.cartographer.worm_x[i],self.cartographer.worm_y[i])
+    
+    def is_mission_over(self):
+        for drone in self.drone_manager.drones:
+            if not drone.mission_completed():
+                return False
+        
+        return True

@@ -51,13 +51,13 @@ class DroneManager():
 
     # Move and display the drones
     def step(self):
-        # Remove the drones drawn in the last positions
-        self.draw_cave()
 
         # Move all drones by one step
         for i in range(self.num_drones):
             self.drones[i].move()
         
+        # Remove the drones drawn in the last positions
+        self.draw_cave()
         # Update the map
         self.draw()
 

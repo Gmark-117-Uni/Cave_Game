@@ -1,6 +1,7 @@
 import os
 import tkinter
 import math
+import pygame
 from enum import Enum
 
 root = tkinter.Tk()
@@ -57,6 +58,7 @@ class Colors(Enum):
         RED          = (255,   0,   0)
         GREEN        = ( 51, 255,  51)
         GREY         = (112, 128, 144)
+        BLUE         = (  0,   0, 153)
 
 class DroneColors(Enum):
         PINK         = (255,  51, 153)
@@ -236,3 +238,9 @@ def wall_hit(map_matrix, pos):
                 return True
 
         return False
+
+def check_pixel_color(surface, pixel, color, is_not=False):
+        if is_not:
+                return pygame.Surface.get_at(surface, pixel)[:3] != color
+        else:
+                return pygame.Surface.get_at(surface, pixel)[:3] == color

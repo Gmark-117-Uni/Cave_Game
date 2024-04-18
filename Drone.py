@@ -2,7 +2,7 @@ import pygame
 import random as rand
 import time
 import math
-from Assets import next_cell_coords
+from Assets import next_cell_coords, check_pixel_color, Colors
 from Graph import Graph
 from AStar import AStar
 
@@ -21,14 +21,16 @@ class Drone():
         self.alpha        = 150
         self.icon         = icon
         self.floor_surf   = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
+        self.floor_surf.fill((*Colors.WHITE.value, 0))
         self.delay        = self.manager.delay
 
         self.show_path    = True
         
         self.border       = []
+        self.start_pos    = start_pos
         self.pos          = start_pos
         self.graph        = Graph(*start_pos, cave)
-        self.astar        = AStar(self.floor_surf, cave, self.color)
+        self.astar        = AStar(self.floor_surf, cave, self.color, self.game)
 
     # Calculate the next position of the drone
     def move(self):
@@ -40,15 +42,13 @@ class Drone():
             except AssertionError:
                 # Update borders
                 self.update_borders()
-                # If there are no valid directions, find the closest border
-                self.reach_border()
-                # End step
-                node_found = True
+                # If there are no valid directions, find the closest border and end step
+                node_found = self.reach_border()
+                # Clean screen after showing the retracing steps
+                #self.manager.draw_cave()
             else:
                 # Otherwise move in one of the valid directions
                 node_found = self.explore(valid_dirs, valid_targets)
-                # Clean screen after showing the retracing steps
-                self.manager.draw_cave()
     
     def find_new_node(self):
         # Calculate next position and record unexplored directions for current position
@@ -114,13 +114,13 @@ class Drone():
             # Update graph
             self.graph.add_node(node)
             # Display the step
-            self.draw_retracing()
+            self.draw_astar()
+        
+        return True
     
     def update_borders(self):
-        # If a border pixel has been explored (is colored) remove it from the border
-        for i in self.border:
-            if pygame.Surface.get_at(self.floor_surf, i)[:3] != (0,0,0):
-                self.border.remove(i)
+        # If a border pixel has been explored (is colored) or is surrounded by explored pixels, remove it
+        self.border = [pixel for pixel in self.border if check_pixel_color(self.floor_surf, pixel, self.color, is_not=True)]
     
     def mission_completed(self):
         # Check if the border pixels list is empty
@@ -129,7 +129,20 @@ class Drone():
     
     def get_distance(self, target):
         # Find the distance between the actual position and the given target position
-        return math.dist(self.pos, target)
+        dist = math.dist(self.pos, target)
+
+        # Discard targets within the current vision circle
+        return self.game.width if dist <= self.radius else dist
+    
+    # NOT ACCESSED
+    def is_alone(self, pixel):
+        # Check the surrounding 8 pixels
+        for mod in self.astar.pos_modifiers:
+            # If at least one of them is white, the current pixel is non a lone white pixel
+            if check_pixel_color(self.floor_surf, (pixel[0]+mod[0], pixel[1]+mod[1]), self.color, is_not=True):
+                return False
+        
+        return True
 
     def update_explored_map(self):
         pass
@@ -153,19 +166,24 @@ class Drone():
                     pygame.draw.line(self.floor_surf, (*self.color, 255),
                                      self.graph.pos[i],
                                      self.graph.pos[i-1], 2)
+        # Draw the starting point
+        self.start_surf = pygame.Surface((12, 12), pygame.SRCALPHA)
+        pygame.draw.circle(self.start_surf, (*Colors.BLUE.value, 255), (6,6), 6)
 
         # Blit the color surface onto the target surface
         self.game.window.blit(self.floor_surf, (0,0))
+        # Blit the circle at the starting position
+        self.game.window.blit(self.start_surf, (self.start_pos[0] - 6, self.start_pos[1] - 6))
 
     # Draw the area the sensors on the drone can see
     def draw_vision(self):
         # Create a surface to draw the circle (                  dimensions, activate transprancy)
         self.circle_surface = pygame.Surface((self.radius*2, self.radius*2),      pygame.SRCALPHA)
         
-        # Draw the circle (            surface,              color, center of the circle on the surface,      radius)
-        pygame.draw.circle(self.circle_surface, (*self.color, 200),           (self.radius,self.radius), self.radius)
+        # Draw the circle (            surface,                              color, center of the circle on the surface,      radius)
+        pygame.draw.circle(self.circle_surface, (*self.color, int(2*self.alpha/3)),           (self.radius,self.radius), self.radius)
 
-        # Blit the circle at the initial point
+        # Blit the circle at the current position
         self.game.window.blit(self.circle_surface, self.center_drawing(self.radius*2,self.radius*2))
 
     # Draw the drone icon
@@ -177,7 +195,8 @@ class Drone():
     def center_drawing(self, width, height):
         return (self.pos[0] - width/2, self.pos[1] - height/2)
     
-    def draw_retracing(self):
+    # Manage drawings during the A* algrithm phase
+    def draw_astar(self):
         self.manager.draw_cave()
         self.manager.draw()
         pygame.display.update()

@@ -1,5 +1,5 @@
 import pygame
-from Assets import sqr, wall_hit
+from Assets import sqr, wall_hit, check_pixel_color, Colors
 
 class Graph():
     def __init__(self, x_start, y_start, cave_mat):
@@ -18,7 +18,7 @@ class Graph():
     # Check if the last added node is valid (WHITE) and
     # if the connection with the second to last node crosses the cave walls
     def is_valid(self, surface, curr_pos, candidate_pos):
-        if (pygame.Surface.get_at(surface, candidate_pos)[:3]==(0,0,0)
+        if (check_pixel_color(surface, candidate_pos, Colors.WHITE.value)
             and not self.cross_obs(*curr_pos, *candidate_pos)):
                 return True
         return False

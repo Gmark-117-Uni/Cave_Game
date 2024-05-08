@@ -30,6 +30,7 @@ class Drone():
         self.border       = []
         self.start_pos    = start_pos
         self.pos          = start_pos
+        self.dir_log      = []
         self.graph        = Graph(*start_pos, cave)
         self.astar        = AStar(self.floor_surf, cave, self.color, self.game)
 
@@ -92,6 +93,9 @@ class Drone():
         # Choose a random valid direction
         self.dir = rand.choice(valid_dirs)
         target = next_cell_coords(*self.pos, self.step, self.dir)
+        
+        # Log the direction chosen
+        self.dir_log.append(self.dir)
 
         # Add the target to the graph
         self.graph.add_node(target)

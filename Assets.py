@@ -263,3 +263,6 @@ def zoom(window, center, zoom_factor):
         #Now zoom_surf has the same size as the window. .blit the surface to the window:
         window.blit(zoom_surf, (0, 0))
         pygame.display.update()
+
+def lidar_scan_dir(dir, max_angle):
+        return # [dir-max_angle,...,dir,...,dir+max_angle]

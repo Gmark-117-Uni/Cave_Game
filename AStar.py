@@ -70,7 +70,7 @@ class AStar():
             self.goal_node  = Node(goal)
 
             # Start timer
-            tic = time.perf_counter()
+            #tic = time.perf_counter()
 
             # Loop until you find the End node
             while self.open:
@@ -80,11 +80,11 @@ class AStar():
                 self.open.remove(curr_node)
                 self.closed.add(curr_node)
 
-                # If the currrent node is the goal, backtrack to find the optimal path
+                # If the currrent node is the goal...
                 if curr_node == self.goal_node:
-                    # Reset the algorithm
+                    # ... reset the algorithm
                     self.clear()
-
+                    # ... backtrack to find the optimal path
                     return self.backtrack(curr_node)
                 
                 # Let the nodes adjacent to the current one be its children
@@ -93,10 +93,12 @@ class AStar():
                 # Show the A* algorithm at work
                 self.draw_process(curr_node)
 
+                '''
                 # Check timer
                 toc = time.perf_counter()
                 if toc - tic > self.deadline:
                     break
+                '''
     
     def backtrack(self, curr_node):
         path = []
@@ -171,4 +173,4 @@ class AStar():
         pygame.draw.circle(self.astar_surf, (*Colors.GREEN.value, 255), self.goal_node.pos, 1)
 
         self.game.window.blit(self.astar_surf, (0,0))
-        zoom(self.game.window, curr_node.pos, 10)
+        #zoom(self.game.window, curr_node.pos, 10)

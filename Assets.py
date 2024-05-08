@@ -25,8 +25,9 @@ FULLSCREEN_H = 1010 #root.winfo_screenheight() - 70
 # Lists for menu voices and settings
 main_menu_states    = ['Start', 'Options', 'Credits', 'Exit']
 options_menu_states = ['Game Volume', 'Music Volume', 'Button Sound', 'Back']
-sim_menu_states     = ['Mode', 'Map Dimension', 'Seed', 'Drones', 'Back', 'Start Simulation']
+sim_menu_states     = ['Mode', 'Map Dimension', 'Seed', 'Drones', 'Scan Mode', 'Back', 'Start Simulation']
 mode_options        = ["Cave exploration", "Rescue mission"]
+scan_options        = ['Radar', 'Lidar']
 map_options         = ["Small", "Medium", "Big"]
 vision_options      = [     39,       19,     4]
 drone_icon_options  = [(30,30),  (10,10), (1,1)]
@@ -244,3 +245,21 @@ def check_pixel_color(surface, pixel, color, is_not=False):
                 return pygame.Surface.get_at(surface, pixel)[:3] != color
         else:
                 return pygame.Surface.get_at(surface, pixel)[:3] == color
+
+def zoom(window, center, zoom_factor):
+        zoom_size = (round(FULLSCREEN_W/zoom_factor), round(FULLSCREEN_H/zoom_factor))
+
+        #Define the rectangular zoom area. The center point of the area is the position where to zoom to. (e.g the cursor position):
+        zoom_area = pygame.Rect(0, 0, *zoom_size)
+        zoom_area.center = center
+
+        #Create a new pygame.Surface with the size of the zoom area and copy the region of the window to the surface, by using ,blit, where the area parameter is set to the zoom region:
+        zoom_surf = pygame.Surface(zoom_area.size)
+        zoom_surf.blit(window, (0, 0), zoom_area)
+
+        #Scale zoom_surf by either pygame.transform.scale() or pygame.transform.smoothscale():
+        zoom_surf = pygame.transform.smoothscale(zoom_surf, (FULLSCREEN_W, FULLSCREEN_H))
+
+        #Now zoom_surf has the same size as the window. .blit the surface to the window:
+        window.blit(zoom_surf, (0, 0))
+        pygame.display.update()

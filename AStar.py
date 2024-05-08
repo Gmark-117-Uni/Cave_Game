@@ -1,7 +1,8 @@
 from operator import attrgetter
+import time
 import math
 import pygame
-from Assets import wall_hit, check_pixel_color, Colors
+from Assets import Colors, wall_hit, check_pixel_color, zoom
 
 class Node():
     def __init__(self, pos, parent=None):
@@ -19,17 +20,23 @@ class Node():
     def __eq__(self, other):
         # Overwrite the == operator to confront positions when called on two nodes
         return self.pos == other.pos
+    
+    def __hash__(self):
+        # Allows Node to be in a set
+        return hash(self.pos)
 
 class AStar():
     def __init__(self, surface, cave_matrix, color, game):
-        self.game    = game
-        self.surface = surface
-        self.cave    = cave_matrix
-        self.color   = color
+        self.game     = game
+        self.surface  = surface
+        self.cave     = cave_matrix
+        self.color    = color
+        self.deadline = 5
+        
         self.astar_surf = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
 
         self.open   = []
-        self.closed = []
+        self.closed = set()
 
         # Surrounding pixels
         self.pos_modifiers = [(-1,-1), (0,-1), (1,-1),
@@ -43,44 +50,53 @@ class AStar():
 
         self.start_node = None
         self.goal_node  = None
+        
+        self.astar_surf = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
     
-    def find_path(self, start, goal):
+    def find_path(self, start, border):
         # Define Start and End nodes
         self.start_node = Node(start)
-        self.goal_node  = Node(goal)
 
         # Add the Start node to the open list
         self.open.append(self.start_node)
 
-        # Loop until you find the End node
-        while self.open:
-            # Let the current node be the one with the minimum value of F
-            # Remove it from the open list and add it to the closed list
-            curr_node = min(self.open, key=attrgetter('f'))
-            self.open.remove(curr_node)
-            self.closed.append(curr_node)
+        # Loop until you run out of time (5 sec), then change goal
+        iteration = -1
+        while True:
+            # If last border pixel was not reached in time
+            iteration += 1
+            # Choose the next closest one
+            goal = border[iteration]
+            self.goal_node  = Node(goal)
 
-            # If the currrent node is the goal, backtrack to find the optimal path
-            if curr_node == self.goal_node:
-                # Reset the algorithm
-                self.clear()
+            # Start timer
+            tic = time.perf_counter()
 
-                return self.backtrack(curr_node)
-            
-            # Let the nodes adjacent to the current one be its children
-            self.find_children(curr_node)
+            # Loop until you find the End node
+            while self.open:
+                # Let the current node be the one with the minimum value of F
+                # Remove it from the open list and add it to the closed list
+                curr_node = min(self.open, key=attrgetter('f'))
+                self.open.remove(curr_node)
+                self.closed.add(curr_node)
 
-            # Show the A* algorithm at work
-            for node in self.open:
-                pygame.Surface.set_at(self.astar_surf, node.pos, (*Colors.RED.value, 255))
-            for node in self.closed:
-                pygame.Surface.set_at(self.astar_surf, node.pos, (*Colors.GREENDARK.value, 255))
-            
-            pygame.draw.circle(self.astar_surf, (*Colors.BLUE.value, 255), self.goal_node.pos, 5, 1)
-            pygame.draw.circle(self.astar_surf, (*Colors.YELLOW.value, 255), self.goal_node.pos, 1, 1)
+                # If the currrent node is the goal, backtrack to find the optimal path
+                if curr_node == self.goal_node:
+                    # Reset the algorithm
+                    self.clear()
 
-            self.game.window.blit(self.astar_surf, (0,0))
-            pygame.display.flip()
+                    return self.backtrack(curr_node)
+                
+                # Let the nodes adjacent to the current one be its children
+                self.find_children(curr_node)
+
+                # Show the A* algorithm at work
+                self.draw_process(curr_node)
+
+                # Check timer
+                toc = time.perf_counter()
+                if toc - tic > self.deadline:
+                    break
     
     def backtrack(self, curr_node):
         path = []
@@ -141,5 +157,18 @@ class AStar():
     
     def in_white_border(self, pos):
         # Allow A* to explore white pixels n steps beyond the colored area
-        n = 2
+        n = 5
         return True if math.dist(pos, self.goal_node.pos) <= n else False
+    
+    def draw_process(self, curr_node):
+        for node in self.open:
+            pygame.Surface.set_at(self.astar_surf, node.pos, (*Colors.RED.value, 255))
+        for node in self.closed:
+            pygame.Surface.set_at(self.astar_surf, node.pos, (*Colors.YELLOW.value, 255))
+
+        pygame.draw.circle(self.astar_surf, (*Colors.BLACK.value, 255), curr_node.pos, 1)
+        pygame.draw.circle(self.astar_surf, (*Colors.GREEN.value, 255), self.goal_node.pos, 5, 1)
+        pygame.draw.circle(self.astar_surf, (*Colors.GREEN.value, 255), self.goal_node.pos, 1)
+
+        self.game.window.blit(self.astar_surf, (0,0))
+        zoom(self.game.window, curr_node.pos, 10)

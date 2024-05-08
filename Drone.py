@@ -16,6 +16,7 @@ class Drone():
         self.id           = id
         self.radius       = 39   # TO BE CALCULATED BASED ON MAP DIMENSION
         self.step         = 10
+        self.dir          = rand.randint(0,359)
 
         self.color        = color
         self.alpha        = 150
@@ -51,12 +52,15 @@ class Drone():
                 node_found = self.explore(valid_dirs, valid_targets)
     
     def find_new_node(self):
+        # Model a 360° RADAR scan or a 120° LIDAR scan
+        directions = 360 if self.settings[4] == 0 else 120
+
         # Calculate next position and record unexplored directions for current position
-        all_dirs = list(range(360))    # How many directions can it take
+        all_dirs = list(range(directions))    # How many directions can it take
         targets  = []
         dir_res  = int(360/len(all_dirs))
 
-        for i in range(len(all_dirs)):
+        for _ in range(len(all_dirs)):
             targets.append([0,0])
 
         dir_blacklist = []
@@ -77,11 +81,17 @@ class Drone():
         assert valid_dirs
 
         return valid_dirs, valid_targets
+        
+        ####################################################################################################################
+        # TO DO NEXT
+        # radar and lidar are atually one function
+        # next_cell_coords needs to be followed by cross_obs with pixel logging to draw the lines
+        ####################################################################################################################
 
     def explore(self, valid_dirs, valid_targets):
         # Choose a random valid direction
-        chosen_dir = rand.choice(valid_dirs)
-        target = next_cell_coords(*self.pos, self.step, chosen_dir)
+        self.dir = rand.choice(valid_dirs)
+        target = next_cell_coords(*self.pos, self.step, self.dir)
 
         # Add the target to the graph
         self.graph.add_node(target)
@@ -90,7 +100,7 @@ class Drone():
         self.pos = target
 
         # Remove explored direction
-        valid_dirs.remove(chosen_dir)
+        valid_dirs.remove(self.dir)
 
         # Add unexplored pixels to the border list (ONLY ONE TIME EACH)
         self.border.extend(valid_targets)
@@ -101,12 +111,12 @@ class Drone():
     def reach_border(self):
         # If there are no dirs left with white pixels just beyond the edge of the vision circle
         # use the A* algorithm to reach the closest border pixel
-        
-        # Find the closest border
-        goal = min(self.border, key=self.get_distance)
+
+        # Sort the border pixels by distance from current position
+        self.border.sort(key=self.get_distance)
 
         # Find the optimal path through the A* algorithm
-        path = self.astar.find_path(self.pos, goal)
+        path = self.astar.find_path(self.pos, self.border)
 
         # Move the drone
         for node in path:
@@ -121,7 +131,7 @@ class Drone():
     def update_borders(self):
         # If a border pixel has been explored (is colored) or is surrounded by explored pixels, remove it
         self.border = [pixel for pixel in self.border if check_pixel_color(self.floor_surf, pixel, self.color, is_not=True)]
-    
+
     def mission_completed(self):
         # Check if the border pixels list is empty
         # If it is: MISSION COMPLETED!
@@ -133,16 +143,6 @@ class Drone():
 
         # Discard targets within the current vision circle
         return self.game.width if dist <= self.radius else dist
-    
-    # NOT ACCESSED
-    def is_alone(self, pixel):
-        # Check the surrounding 8 pixels
-        for mod in self.astar.pos_modifiers:
-            # If at least one of them is white, the current pixel is non a lone white pixel
-            if check_pixel_color(self.floor_surf, (pixel[0]+mod[0], pixel[1]+mod[1]), self.color, is_not=True):
-                return False
-        
-        return True
 
     def update_explored_map(self):
         pass

@@ -42,7 +42,7 @@ class Game():
     # Run the simulation
     def game_loop(self):
         if self.playing:
-            # Settings : [Mode, Map Dimension, Seed, Drone Number]
+            # Settings : [Mode, Map Dimension, Seed, Drone Number, Scan Mode]
             self.sim_settings  = self.simulation.get_sim_settings()
             # Generate the cave
             self.cartographer = MapGenerator(self, True)

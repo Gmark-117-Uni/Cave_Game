@@ -54,7 +54,7 @@ class Drone():
     
     def find_new_node(self):
         # Model a 360° RADAR scan or a 120° LIDAR scan
-        directions = 360 if self.settings[4] == 0 else 120
+        directions = 360 #if self.settings[4] == 0 else 120
 
         # Calculate next position and record unexplored directions for current position
         all_dirs = list(range(directions))    # How many directions can it take
@@ -82,12 +82,6 @@ class Drone():
         assert valid_dirs
 
         return valid_dirs, valid_targets
-        
-        ####################################################################################################################
-        # TO DO NEXT
-        # radar and lidar are atually one function
-        # next_cell_coords needs to be followed by cross_obs with pixel logging to draw the lines
-        ####################################################################################################################
 
     def explore(self, valid_dirs, valid_targets):
         # Choose a random valid direction
@@ -133,7 +127,7 @@ class Drone():
         return True
     
     def update_borders(self):
-        # If a border pixel has been explored (is colored) or is surrounded by explored pixels, remove it
+        # If a pixel in the border list is still white, keep it
         self.border = [pixel for pixel in self.border if check_pixel_color(self.floor_surf, pixel, self.color, is_not=True)]
 
     def mission_completed(self):

@@ -44,6 +44,10 @@ class MissionControl():
 
     # Mission loop
     def start_mission(self):
+
+        # Start timer
+        tic = time.perf_counter()
+
         # Keep moving the drones until the mission is completed
         while not self.completed:
             for event in pygame.event.get():
@@ -60,6 +64,10 @@ class MissionControl():
             if self.timelapse and (self.drone_manager.node_id % 10) == 0:
                 name = "Screenshot_" + str(self.drone_manager.node_id) + ".png"
                 pygame.image.save(self.game.window, name)
+
+        # Check timer
+        toc = time.perf_counter()
+        print(toc-tic)
         
     # Among the starting positions of the worms, find one that is viable
     def set_start_point(self):

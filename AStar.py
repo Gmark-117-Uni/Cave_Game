@@ -41,7 +41,7 @@ class AStar():
         # Surrounding pixels
         self.pos_modifiers = [(-1,-1), (0,-1), (1,-1),
                               (-1, 0),         (1, 0),
-                              (-1, 1), (0, 1), (1, 1),]
+                              (-1, 1), (0, 1), (1, 1)]
 
     def clear(self):
         # When a path is found reset the variables
@@ -69,9 +69,6 @@ class AStar():
             goal = border[iteration]
             self.goal_node  = Node(goal)
 
-            # Start timer
-            #tic = time.perf_counter()
-
             # Loop until you find the End node
             while self.open:
                 # Let the current node be the one with the minimum value of F
@@ -92,13 +89,6 @@ class AStar():
 
                 # Show the A* algorithm at work
                 self.draw_process(curr_node)
-
-                '''
-                # Check timer
-                toc = time.perf_counter()
-                if toc - tic > self.deadline:
-                    break
-                '''
     
     def backtrack(self, curr_node):
         path = []
@@ -149,7 +139,7 @@ class AStar():
             child.f = child.g + child.h
 
             # If the child is already in the open list with a lower G
-            if len([open_node for open_node in self.open if child.pos == open_node.pos and child.g > open_node.g]) > 0:
+            if len([open_node for open_node in self.open if child.pos == open_node.pos and child.g >= open_node.g]) > 0:
                 # Skip it
                 continue
             
@@ -176,7 +166,7 @@ class AStar():
         for node in self.closed:
             pygame.Surface.set_at(self.astar_surf, node.pos, (*Colors.YELLOW.value, 255))
 
-        pygame.draw.circle(self.astar_surf, (*Colors.BLACK.value, 255), curr_node.pos, 1)
+        pygame.draw.circle(self.astar_surf, (*Colors.BLUE.value, 255), curr_node.pos, 1)
         pygame.draw.circle(self.astar_surf, (*Colors.GREEN.value, 255), self.goal_node.pos, 5, 1)
         pygame.draw.circle(self.astar_surf, (*Colors.GREEN.value, 255), self.goal_node.pos, 1)
 

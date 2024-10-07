@@ -249,11 +249,15 @@ def check_pixel_color(surface, pixel, color, is_not=False):
 def zoom(window, center, zoom_factor):
         zoom_size = (round(FULLSCREEN_W/zoom_factor), round(FULLSCREEN_H/zoom_factor))
 
-        #Define the rectangular zoom area. The center point of the area is the position where to zoom to. (e.g the cursor position):
+        # Define the rectangular zoom area.
+        # The center point of the area is the position where to zoom to.
+        # (e.g the cursor position):
         zoom_area = pygame.Rect(0, 0, *zoom_size)
         zoom_area.center = center
 
-        #Create a new pygame.Surface with the size of the zoom area and copy the region of the window to the surface, by using ,blit, where the area parameter is set to the zoom region:
+        # Create a new pygame.Surface with the size of the zoom area
+        # and copy the region of the window to the surface, by using 'blit'
+        # where the area parameter is set to the zoom region:
         zoom_surf = pygame.Surface(zoom_area.size)
         zoom_surf.blit(window, (0, 0), zoom_area)
 

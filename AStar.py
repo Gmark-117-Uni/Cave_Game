@@ -7,7 +7,7 @@ from Assets import Colors, wall_hit, check_pixel_color, zoom
 class Node():
     def __init__(self, pos, parent=None):
         self.pos     = pos
-        self.parent = parent
+        self.parent  = parent
 
         # F is the total cost of the node
         # G is the distance between the current node and the start node
@@ -135,15 +135,23 @@ class AStar():
                 continue
 
             # Calculate values for G, H, F
+            D = 1
+            D2 = 1
+            dx = abs((child.pos[0] - self.goal_node.pos[0]))
+            dy = abs((child.pos[1] - self.goal_node.pos[1]))
             child.g = curr_node.g + 1
-            child.h = ((child.pos[0] - self.goal_node.pos[0]) ** 2) + ((child.pos[1] - self.goal_node.pos[1]) ** 2)
+
+            # HEURISTIC
+            # Diagonal Distance
+            child.h = D*(dx + dy) + (D2 - 2*D)*min(dx,dy)
+
+
             child.f = child.g + child.h
 
-            for open_node in self.open:
-                # If the child is already in the open list with a lower G
-                if child == open_node and child.g > open_node.g:
-                    # Skip it
-                    continue
+            # If the child is already in the open list with a lower G
+            if len([open_node for open_node in self.open if child.pos == open_node.pos and child.g > open_node.g]) > 0:
+                # Skip it
+                continue
             
             # Add the child to the open list
             self.open.append(child)
@@ -159,7 +167,7 @@ class AStar():
     
     def in_white_border(self, pos):
         # Allow A* to explore white pixels n steps beyond the colored area
-        n = 5
+        n = 100
         return True if math.dist(pos, self.goal_node.pos) <= n else False
     
     def draw_process(self, curr_node):

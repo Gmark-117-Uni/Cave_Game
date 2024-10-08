@@ -26,6 +26,7 @@ class Drone():
         self.delay        = self.manager.delay
 
         self.show_path    = True
+        self.target_practice = False
         
         self.border       = []
         self.start_pos    = start_pos
@@ -113,6 +114,7 @@ class Drone():
         # Sort the border pixels by distance from current position
         self.border.sort(key=self.get_distance)
 
+        self.target_practice = True
         self.draw_astar()
 
         # Find the optimal path through the A* algorithm
@@ -125,6 +127,7 @@ class Drone():
             self.graph.add_node(node)
             # Display the step
             self.draw_astar()
+            self.target_practice = False
         
         return True
     
@@ -179,7 +182,7 @@ class Drone():
         # Blit the circle at the starting position
         self.game.window.blit(self.start_surf, (self.start_pos[0] - 6, self.start_pos[1] - 6))
         # Blit the A* target
-        if self.border:
+        if self.target_practice:
             self.game.window.blit(self.astar_target_surf, (self.border[0][0] - 6, self.border[0][1] - 6))
 
     # Draw the area the sensors on the drone can see

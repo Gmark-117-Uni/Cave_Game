@@ -113,6 +113,8 @@ class Drone():
         # Sort the border pixels by distance from current position
         self.border.sort(key=self.get_distance)
 
+        self.draw_astar()
+
         # Find the optimal path through the A* algorithm
         path = self.astar.find_path(self.pos, self.border)
 
@@ -168,10 +170,17 @@ class Drone():
         self.start_surf = pygame.Surface((12, 12), pygame.SRCALPHA)
         pygame.draw.circle(self.start_surf, (*Colors.BLUE.value, 255), (6,6), 6)
 
+        # Draw the A* target
+        self.astar_target_surf = pygame.Surface((12, 12), pygame.SRCALPHA)
+        pygame.draw.circle(self.astar_target_surf, (*Colors.GREEN.value, 255), (6,6), 6)
+
         # Blit the color surface onto the target surface
         self.game.window.blit(self.floor_surf, (0,0))
         # Blit the circle at the starting position
         self.game.window.blit(self.start_surf, (self.start_pos[0] - 6, self.start_pos[1] - 6))
+        # Blit the A* target
+        if self.border:
+            self.game.window.blit(self.astar_target_surf, (self.border[0][0] - 6, self.border[0][1] - 6))
 
     # Draw the area the sensors on the drone can see
     def draw_vision(self):

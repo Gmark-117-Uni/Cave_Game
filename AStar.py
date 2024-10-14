@@ -2,6 +2,7 @@ from operator import attrgetter
 import time
 import math
 import pygame
+import heapq
 from Assets import Colors, wall_hit, check_pixel_color, zoom
 
 class Node():
@@ -9,10 +10,6 @@ class Node():
         self.pos     = pos
         self.parent  = parent
 
-        # F is the total cost of the node
-        # G is the distance between the current node and the start node
-        # H is the heuristic (estimated) distance from the current node to the end node
-        # F = G + H
         self.f = 0
         self.g = 0
         self.h = 0
@@ -24,6 +21,10 @@ class Node():
     def __hash__(self):
         # Allows Node to be in a set
         return hash(self.pos)
+    
+    # Nuovo metodo __lt__ per confrontare due nodi in base a f
+    def __lt__(self, other):
+        return self.f < other.f
 
 class AStar():
     def __init__(self, surface, cave_matrix, color, game):
@@ -36,6 +37,7 @@ class AStar():
         self.astar_surf = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
 
         self.open   = []
+        self.open_dict = {}  # Dictionary for optimizing the research
         self.closed = set()
 
         # Surrounding pixels
@@ -46,6 +48,7 @@ class AStar():
     def clear(self):
         # When a path is found reset the variables
         self.open.clear()
+        self.open_dict.clear()  
         self.closed.clear()
 
         self.start_node = None
@@ -57,8 +60,10 @@ class AStar():
         # Define Start and End nodes
         self.start_node = Node(start)
 
-        # Add the Start node to the open list
-        self.open.append(self.start_node)
+        # Add the Start node to the priority queue
+        heapq.heappush(self.open, (self.start_node.f, self.start_node))
+        # And to te dictionary
+        self.open_dict[self.start_node.pos] = self.start_node  
 
         # Loop until you run out of time (5 sec), then change goal
         iteration = -1
@@ -71,25 +76,29 @@ class AStar():
 
             # Loop until you find the End node
             while self.open:
-                # Let the current node be the one with the minimum value of F
-                # Remove it from the open list and add it to the closed list
-                curr_node = min(self.open, key=attrgetter('f'))
-                self.open.remove(curr_node)
+                # Remove the node with the lowest cost from the open list
+                curr_node = heapq.heappop(self.open)[1]
+                
+                # Remove curr_node from open_dict if present
+                if curr_node.pos in self.open_dict:
+                    del self.open_dict[curr_node.pos]
+                else:
+                    print(f"Error: {curr_node.pos} not found in open_dict!")
+                
+                # Add the current node to the closed list
                 self.closed.add(curr_node)
 
-                # If the currrent node is the goal...
+                # Check if you have reached the goal
                 if curr_node == self.goal_node:
-                    # ... reset the algorithm
-                    self.clear()
-                    # ... backtrack to find the optimal path
+                    # Backtracking 
                     return self.backtrack(curr_node)
-                
-                # Let the nodes adjacent to the current one be its children
+
+                # Generate the children of the current node
                 self.find_children(curr_node)
 
-                # Show the A* algorithm at work
-                self.draw_process(curr_node)
-    
+                # Show the process (slower, only for debugging)
+                # self.draw_process(curr_node)
+                
     def backtrack(self, curr_node):
         path = []
         current = curr_node
@@ -125,26 +134,34 @@ class AStar():
                 continue
 
             # Calculate values for G, H, F
-            D = 1
-            D2 = 1
-            dx = abs((child.pos[0] - self.goal_node.pos[0]))
-            dy = abs((child.pos[1] - self.goal_node.pos[1]))
-            child.g = curr_node.g + 1
-
-            # HEURISTIC
-            # Diagonal Distance
-            child.h = D*(dx + dy) + (D2 - 2*D)*min(dx,dy)
-
-
-            child.f = child.g + child.h
-
-            # If the child is already in the open list with a lower G
-            if len([open_node for open_node in self.open if child.pos == open_node.pos and child.g >= open_node.g]) > 0:
-                # Skip it
-                continue
+            D1 = 1  # Horizontal or vertical distance
+            D2 = math.sqrt(2)  # Diagonal distance
+            dx = abs(child.pos[0] - self.goal_node.pos[0])
+            dy = abs(child.pos[1] - self.goal_node.pos[1])
             
-            # Add the child to the open list
-            self.open.append(child)
+            # H is the heuristic (estimated) distance from the current node to the end node
+            child.h = D1 * (dx + dy) + (D2 - 2 * D1) * min(dx, dy) 
+            # G is the distance between the current node and the start node
+            child.g = curr_node.g + 1
+            # F is the total cost of the node 
+            child.f = child.g + child.h  
+
+            # If the node is already open with a better cost, ignore it
+            if child.pos in self.open_dict:
+                existing_node = self.open_dict[child.pos]
+                if child.g >= existing_node.g:
+                    continue  # Ignore the new node if it has a cost greater than or equal
+
+                # Update the existing node without removing it from the open list
+                existing_node.g = child.g
+                existing_node.f = child.f
+                existing_node.parent = curr_node  # Update the parent
+                
+            else:
+                # Add the node to open and open_dict
+                heapq.heappush(self.open, (child.f, child))
+                self.open_dict[child.pos] = child
+                # print(f"Aggiunto nodo: {child.pos} con g: {child.g}")
     
     # Check if the child is valid (explored) and is not a wall
     def is_valid(self, pos):
@@ -161,14 +178,15 @@ class AStar():
         return True if math.dist(pos, self.goal_node.pos) <= n else False
     
     def draw_process(self, curr_node):
-        for node in self.open:
-            pygame.Surface.set_at(self.astar_surf, node.pos, (*Colors.RED.value, 255))
+        px_array = pygame.PixelArray(self.astar_surf)
+        for _, node in self.open:
+            px_array[node.pos[0], node.pos[1]] = Colors.RED.value
         for node in self.closed:
-            pygame.Surface.set_at(self.astar_surf, node.pos, (*Colors.YELLOW.value, 255))
+            px_array[node.pos[0], node.pos[1]] = Colors.YELLOW.value
+        del px_array 
 
         pygame.draw.circle(self.astar_surf, (*Colors.BLUE.value, 255), curr_node.pos, 1)
         pygame.draw.circle(self.astar_surf, (*Colors.GREEN.value, 255), self.goal_node.pos, 5, 1)
         pygame.draw.circle(self.astar_surf, (*Colors.GREEN.value, 255), self.goal_node.pos, 1)
 
         self.game.window.blit(self.astar_surf, (0,0))
-        #zoom(self.game.window, curr_node.pos, 10)

@@ -32,7 +32,7 @@ class DroneManager():
         self.drone_icon = pygame.transform.scale(self.drone_icon, icon_size)
 
         # Extract settings
-        self.num_drones = 1#self.settings[3]
+        self.num_drones = self.settings[3]
 
         # List to store drone colors
         self.colors = list(Assets.DroneColors)

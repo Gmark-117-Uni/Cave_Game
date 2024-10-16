@@ -65,39 +65,34 @@ class AStar():
         # And to te dictionary
         self.open_dict[self.start_node.pos] = self.start_node  
 
-        # Loop until you run out of time (5 sec), then change goal
-        iteration = -1
-        while True:
-            # If last border pixel was not reached in time
-            iteration += 1
-            # Choose the next closest one
-            goal = border[iteration]
-            self.goal_node  = Node(goal)
+        # Choose the closest one
+        goal = border[0]
+        self.goal_node  = Node(goal)
 
-            # Loop until you find the End node
-            while self.open:
-                # Remove the node with the lowest cost from the open list
-                curr_node = heapq.heappop(self.open)[1]
-                
-                # Remove curr_node from open_dict if present
-                if curr_node.pos in self.open_dict:
-                    del self.open_dict[curr_node.pos]
-                else:
-                    print(f"Error: {curr_node.pos} not found in open_dict!")
-                
-                # Add the current node to the closed list
-                self.closed.add(curr_node)
+        # Loop until you find the End node
+        while self.open:
+            # Remove the node with the lowest cost from the open list
+            curr_node = heapq.heappop(self.open)[1]
+            
+            # Remove curr_node from open_dict if present
+            if curr_node.pos in self.open_dict:
+                del self.open_dict[curr_node.pos]
+            else:
+                print(f"Error: {curr_node.pos} not found in open_dict!")
+            
+            # Add the current node to the closed list
+            self.closed.add(curr_node)
 
-                # Check if you have reached the goal
-                if curr_node == self.goal_node:
-                    # Backtracking 
-                    return self.backtrack(curr_node)
+            # Check if you have reached the goal
+            if curr_node == self.goal_node:
+                # Backtracking 
+                return self.backtrack(curr_node)
 
-                # Generate the children of the current node
-                self.find_children(curr_node)
+            # Generate the children of the current node
+            self.find_children(curr_node)
 
-                # Show the process (slower, only for debugging)
-                # self.draw_process(curr_node)
+            # Show the process (slower, only for debugging)
+            # self.draw_process(curr_node)
                 
     def backtrack(self, curr_node):
         path = []
@@ -161,22 +156,23 @@ class AStar():
                 # Add the node to open and open_dict
                 heapq.heappush(self.open, (child.f, child))
                 self.open_dict[child.pos] = child
-                # print(f"Aggiunto nodo: {child.pos} con g: {child.g}")
+                # print(f"Node added: {child.pos} with g: {child.g}")
     
     # Check if the child is valid (explored) and is not a wall
     def is_valid(self, pos):
-        if ((check_pixel_color(self.surface, pos, Colors.WHITE.value, is_not=True)
-             or self.in_white_border(pos))
+        if ((check_pixel_color(self.surface, pos, Colors.WHITE.value, is_not=True) #or self.in_white_border(pos)
+             )
              and not wall_hit(self.cave, pos)):
                 return True
         
         return False
     
+    # Allow A* to explore white pixels n steps beyond the colored area
     def in_white_border(self, pos):
-        # Allow A* to explore white pixels n steps beyond the colored area
         n = 100
         return True if math.dist(pos, self.goal_node.pos) <= n else False
     
+    # Visualize A* at work
     def draw_process(self, curr_node):
         px_array = pygame.PixelArray(self.astar_surf)
         for _, node in self.open:

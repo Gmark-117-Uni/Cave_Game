@@ -72,7 +72,7 @@ class Drone():
     # Find a valid direction around the drone
     def find_new_node(self):
         # Model a 360° RADAR scan (or 3 120° LIDAR scan)
-        directions = 360 # if self.settings[4] == 0 else 120
+        directions = 360
 
         # Calculate next position and record unexplored directions for current position
         all_dirs = list(range(directions)) # How many directions can it take

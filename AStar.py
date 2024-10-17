@@ -167,7 +167,7 @@ class AStar():
         # A pixel is valid if it's either not white and not a wall or is the drone's color
         return (is_pixel_white or is_pixel_drone_color) and not wall_hit(self.cave, pos)
     
-    
+    # Visualize A* at work
     def draw_process(self, curr_node):
         px_array = pygame.PixelArray(self.astar_surf)
         for _, node in self.open:

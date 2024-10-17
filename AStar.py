@@ -3,7 +3,7 @@ import time
 import math
 import pygame
 import heapq
-from Assets import Colors, wall_hit, check_pixel_color, zoom
+from Assets import Colors, wall_hit, check_pixel_color
 
 class Node():
     def __init__(self, pos, parent=None):
@@ -65,7 +65,9 @@ class AStar():
         # And to te dictionary
         self.open_dict[self.start_node.pos] = self.start_node  
 
-        # Choose the closest one
+        # Loop until you run out of time (5 sec), then change goal
+       
+        # Choose the next closest one
         goal = border[0]
         self.goal_node  = Node(goal)
 
@@ -156,23 +158,18 @@ class AStar():
                 # Add the node to open and open_dict
                 heapq.heappush(self.open, (child.f, child))
                 self.open_dict[child.pos] = child
-                # print(f"Node added: {child.pos} with g: {child.g}")
+                # print(f"Aggiunto nodo: {child.pos} con g: {child.g}")
     
     # Check if the child is valid (explored) and is not a wall
     def is_valid(self, pos):
-        if ((check_pixel_color(self.surface, pos, Colors.WHITE.value, is_not=True) #or self.in_white_border(pos)
-             )
-             and not wall_hit(self.cave, pos)):
-                return True
-        
-        return False
+        # Check if the pixel at 'pos' is either white or the same color as the drone
+        is_pixel_white = check_pixel_color(self.surface, pos, Colors.WHITE.value, is_not=True)
+        is_pixel_drone_color = check_pixel_color(self.surface, pos, self.color, is_not=True)
+
+        # A pixel is valid if it's either not white and not a wall or is the drone's color
+        return (is_pixel_white or is_pixel_drone_color) and not wall_hit(self.cave, pos)
     
-    # Allow A* to explore white pixels n steps beyond the colored area
-    def in_white_border(self, pos):
-        n = 100
-        return True if math.dist(pos, self.goal_node.pos) <= n else False
     
-    # Visualize A* at work
     def draw_process(self, curr_node):
         px_array = pygame.PixelArray(self.astar_surf)
         for _, node in self.open:

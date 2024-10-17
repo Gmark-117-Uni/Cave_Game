@@ -65,8 +65,6 @@ class AStar():
         # And to te dictionary
         self.open_dict[self.start_node.pos] = self.start_node  
 
-        # Loop until you run out of time (5 sec), then change goal
-       
         # Choose the next closest one
         goal = border[0]
         self.goal_node  = Node(goal)
@@ -158,7 +156,7 @@ class AStar():
                 # Add the node to open and open_dict
                 heapq.heappush(self.open, (child.f, child))
                 self.open_dict[child.pos] = child
-                # print(f"Aggiunto nodo: {child.pos} con g: {child.g}")
+                # print(f"Added node: {child.pos} with g: {child.g}")
     
     # Check if the child is valid (explored) and is not a wall
     def is_valid(self, pos):

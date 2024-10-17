@@ -4,10 +4,8 @@ from Assets import sqr, wall_hit, check_pixel_color, Colors
 class Graph():
     def __init__(self, x_start, y_start, cave_mat):
         self.cave_mat = cave_mat
-
         # Initialise positions list
         self.pos = []
-
         # Set start point
         self.pos.append((x_start,y_start))
     
@@ -31,7 +29,6 @@ class Graph():
         sx = 1 if x1<x2 else -1
         dy = -abs(y2 - y1)
         sy = 1 if y1<y2 else -1
-
         # Define error
         error = dx + dy
 

@@ -15,10 +15,10 @@ class Drone():
         self.cave         = cave
         self.manager      = manager
          
-        self.id           = id # Unique identifier of the drone
-        self.map_size     = self.settings[1] # Map dimension
-        self.radius       = self.calculate_radius() # Radius that represent the field of view # 39
-        self.step         = 10 # Step of the drone
+        self.id           = id # unique identifier of the drone
+        self.map_size     = self.settings[1] # map dimension
+        self.radius       = self.calculate_radius() # radius that represent the field of view # 39
+        self.step         = 10 # step of the drone
         self.dir          = rand.randint(0,359)
 
         self.color        = color
@@ -44,15 +44,11 @@ class Drone():
         
     # Define the radius based on the map size
     def calculate_radius(self):
-        print(self.map_size)
-        if   self.map_size == 'SMALL':  # Small map
-            return 40  
-        elif self.map_size == 'MEDIUM':  # Medium map
-            return 20  
-        elif self.map_size == 'BIG':  # Large map
-            return 10  
-        else:
-            return 20  # Default value in case of unknown size
+        match self.map_size:
+            case 'SMALL' : return 40
+            case 'MEDIUM': return 20
+            case 'BIG'   : return 10
+            case _       : return 20
         
     # Manage the movement of the drone
     def move(self):
@@ -101,7 +97,6 @@ class Drone():
         assert valid_dirs
         return valid_dirs, valid_targets
 
-    # DA MODIFICARE
     def explore(self, valid_dirs, valid_targets):
         # Choose a random valid direction
         self.dir = rand.choice(valid_dirs)
@@ -125,11 +120,9 @@ class Drone():
         
         return True
     
-    # no free directions -> use A* 
+    # If there are no dirs left with white pixels just beyond the edge of the vision circle
+    # use the A* algorithm to reach the closest border pixel
     def reach_border(self):
-        # If there are no dirs left with white pixels just beyond the edge of the vision circle
-        # use the A* algorithm to reach the closest border pixel
-        
         # Clear the state of the A* algorithm
         self.astar.clear()
         

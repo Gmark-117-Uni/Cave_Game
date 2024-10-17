@@ -15,7 +15,6 @@ class Drone():
         self.manager      = manager
          
         self.id           = id # unique identifier of the drone
-        print(self.id)
         self.map_size     = self.settings[1] # map dimension
         self.radius       = self.calculate_radius() # radius that represent the field of view # 39
         self.step         = 10 # step of the drone

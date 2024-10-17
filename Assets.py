@@ -237,7 +237,6 @@ def next_cell_coords(x, y, step_len, dir):
 def wall_hit(map_matrix, pos):
         if map_matrix[pos[1]][pos[0]]==1:
                 return True
-
         return False
 
 def check_pixel_color(surface, pixel, color, is_not=False):
@@ -267,6 +266,3 @@ def zoom(window, center, zoom_factor):
         #Now zoom_surf has the same size as the window. .blit the surface to the window:
         window.blit(zoom_surf, (0, 0))
         pygame.display.update()
-
-def lidar_scan_dir(dir, max_angle):
-        return # [dir-max_angle,...,dir,...,dir+max_angle]

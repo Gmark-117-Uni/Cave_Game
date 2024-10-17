@@ -22,7 +22,7 @@ class SimulationMenu(Menu):
 
         self.mode      = 0
         self.map_dim   = 0
-        self.n_drones  = 3
+        self.n_drones  = 1
         self.scan_mode = 0
        
         # Define positions for menu text
@@ -256,7 +256,7 @@ class SimulationMenu(Menu):
                 case 'Drones':
                     match self.n_drones:
                         case 8:
-                            self.n_drones = 3
+                            self.n_drones = 1
                         case _:
                             self.n_drones += 1
                     return

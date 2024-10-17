@@ -65,6 +65,8 @@ class AStar():
         # And to te dictionary
         self.open_dict[self.start_node.pos] = self.start_node  
 
+        # Loop until you run out of time (5 sec), then change goal
+       
         # Choose the next closest one
         goal = border[0]
         self.goal_node  = Node(goal)
@@ -156,7 +158,7 @@ class AStar():
                 # Add the node to open and open_dict
                 heapq.heappush(self.open, (child.f, child))
                 self.open_dict[child.pos] = child
-                # print(f"Added node: {child.pos} with g: {child.g}")
+                # print(f"Aggiunto nodo: {child.pos} con g: {child.g}")
     
     # Check if the child is valid (explored) and is not a wall
     def is_valid(self, pos):
@@ -167,7 +169,7 @@ class AStar():
         # A pixel is valid if it's either not white and not a wall or is the drone's color
         return (is_pixel_white or is_pixel_drone_color) and not wall_hit(self.cave, pos)
     
-    # Visualize A* at work
+    
     def draw_process(self, curr_node):
         px_array = pygame.PixelArray(self.astar_surf)
         for _, node in self.open:

@@ -237,7 +237,6 @@ def next_cell_coords(x, y, step_len, dir):
 def wall_hit(map_matrix, pos):
         if map_matrix[pos[1]][pos[0]]==1:
                 return True
-
         return False
 
 def check_pixel_color(surface, pixel, color, is_not=False):

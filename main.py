@@ -12,4 +12,3 @@ if __name__=='__main__':
         g.game_loop()
         # Reset keys after processing events
         g.reset_keys()
-    

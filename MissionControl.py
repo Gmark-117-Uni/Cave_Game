@@ -2,7 +2,7 @@ import random as rand
 import pygame
 import time
 import sys
-import numpy as np
+import math
 import threading
 import Assets
 from Drone import Drone
@@ -51,6 +51,15 @@ class MissionControl():
         self.build_drones()
         self.draw_cave()
         self.draw()
+
+        # ROVER INITIALISATION
+        self.num_rovers = math.ceil(self.settings[3]/4)
+        # Set drone icon
+        self.rover_icon = pygame.image.load(Assets.Images['ROVER'].value)
+        self.rover_icon = pygame.transform.scale(self.rover_icon, (50,50))
+
+        # List to store rover colors (Deprecated: Rovers don't need colors)
+        self.colors = [Assets.Colors['GREY'].value, Assets.Colors['RED'].value]
 
         # Show the map and the robots at step 0 for 1 second
         pygame.display.update()

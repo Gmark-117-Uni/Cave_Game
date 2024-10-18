@@ -54,7 +54,7 @@ class Drone():
         while not node_found:
             try:
                 # Find all valid directions
-                valid_dirs, valid_targets = self.find_new_node()
+                valid_dirs, valid_targets, chosen_target = self.find_new_node()
             except AssertionError:
                 # Update borders
                 self.update_borders()
@@ -62,7 +62,7 @@ class Drone():
                 node_found = self.reach_border()
             else:
                 # Otherwise move in one of the valid directions
-                node_found = self.explore(valid_dirs, valid_targets)
+                node_found = self.explore(valid_dirs, valid_targets, chosen_target)
     
     # Find a valid direction around the drone
     def find_new_node(self):
@@ -81,7 +81,7 @@ class Drone():
         for i in all_dirs:
             # Find the target pixel in that direction
             targets[i][0], targets[i][1] = next_cell_coords(*self.pos, self.radius + 1, i*dir_res)
-
+            
             # If the target is a white pixel:
             if not self.graph.is_valid(self.floor_surf, self.pos, (*targets[i],)):
                 # Add the direction to the blacklist
@@ -90,25 +90,33 @@ class Drone():
         # Filter the directions through the blacklist
         valid_dirs    = [dir for dir in all_dirs if dir not in dir_blacklist]
         valid_targets = [(*targets[valid_dir],) for valid_dir in valid_dirs]
-        
+
         # If there is at least one dir left to be explored
         assert valid_dirs
 
-        return valid_dirs, valid_targets
-
-    def explore(self, valid_dirs, valid_targets):
         # Choose a random valid direction
         self.dir = rand.choice(valid_dirs)
         target = next_cell_coords(*self.pos, self.step, self.dir)
-        
+        while not self.graph.is_valid(self.floor_surf, self.pos, target, step=True):
+            valid_dirs.remove(self.dir)
+            valid_targets.remove((*targets[self.dir],))
+
+            assert valid_dirs
+
+            self.dir = rand.choice(valid_dirs)
+            target = next_cell_coords(*self.pos, self.step, self.dir)
+
+        return valid_dirs, valid_targets, target
+
+    def explore(self, valid_dirs, valid_targets, chosen_target):
         # Log the direction chosen
         self.dir_log.append(self.dir)
 
         # Add the target to the graph
-        self.graph.add_node(target)
+        self.graph.add_node(chosen_target)
 
         # Update position
-        self.pos = target
+        self.pos = chosen_target
 
         # Remove explored direction
         valid_dirs.remove(self.dir)

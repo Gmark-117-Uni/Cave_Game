@@ -17,11 +17,18 @@ class Graph():
     
     # Check if the last added node is valid (WHITE) and
     # if the connection with the second to last node crosses the cave walls
-    def is_valid(self, surface, curr_pos, candidate_pos):
-        if (check_pixel_color(surface, candidate_pos, Colors.WHITE.value)
-            and not self.cross_obs(*curr_pos, *candidate_pos)):
-                return True
-        return False
+    def is_valid(self, surface, curr_pos, candidate_pos, step=False):
+        if step:
+            if (not wall_hit(self.cave_mat, candidate_pos)
+                and not self.cross_obs(*curr_pos, *candidate_pos)):
+                    return True
+            return False
+        else:
+            if (check_pixel_color(surface, candidate_pos, Colors.WHITE.value)
+                and not wall_hit(self.cave_mat, candidate_pos)
+                and not self.cross_obs(*curr_pos, *candidate_pos)):
+                    return True
+            return False
     
     # Check if the connection with the second to last node crosses the cave walls
     # using the Bresenham's line algorithm

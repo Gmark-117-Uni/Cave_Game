@@ -26,6 +26,8 @@ class Drone():
         self.alpha        = 150
         self.icon         = icon
         
+        self.explored = False # Flag to track if the exploration has started
+        
         # Transparent surface used to track the explored path
         self.floor_surf   = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
         self.floor_surf.fill((*Colors.WHITE.value, 0))
@@ -110,7 +112,8 @@ class Drone():
         return valid_dirs, valid_targets, target
 
     def explore(self, valid_dirs, valid_targets, chosen_target):
-        
+        # Flag to indicate whether the exploration has begun
+        self.explored = True
         # Log the direction chosen
         self.dir_log.append(self.dir)
         # Add the target node to the graph
@@ -122,7 +125,6 @@ class Drone():
         # Add unexplored pixels to the border list (each pixel only added once)
         self.border.extend(valid_targets)
         self.border = list(set(self.border))
-        
         return True
     
     # If no valid directions are found, use A* algorithm to reach the nearest border pixel
@@ -147,10 +149,13 @@ class Drone():
 
     # Check if the mission is completed (no border pixels left)
     def mission_completed(self):
+        # Verify that the mission cannot be completed if it has never been explored
+        if not self.explored:
+            return False
         if not self.border:  # If the border list is empty, the mission is considered completed
             print(f"Drone {self.id} has completed the mission!")  
             return True  # Mission completed
-        return bool(False) 
+        return False
     
      # Calculate distance from the current position to the target
     def get_distance(self, target):
@@ -181,6 +186,10 @@ class Drone():
                                      self.graph.pos[i],
                                      self.graph.pos[i-1], 2)
 
+        # Draw the starting point
+        self.start_surf = pygame.Surface((12, 12), pygame.SRCALPHA)
+        pygame.draw.circle(self.start_surf, (*Colors.BLUE.value, 255), (6,6), 6)
+        
         # Blit the explored path surface and the starting point onto the game window
         self.game.window.blit(self.floor_surf, (0,0))
         self.game.window.blit(self.start_surf, (self.start_pos[0] - 6, self.start_pos[1] - 6))

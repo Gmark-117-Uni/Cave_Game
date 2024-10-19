@@ -6,7 +6,6 @@ from enum import Enum
 
 root = tkinter.Tk()
 
-
 #  ____   _____  _____  _____  ___  _   _   ____  ____  
 # / ___| | ____||_   _||_   _||_ _|| \ | | / ___|/ ___|
 # \___ \ |  _|    | |    | |   | | |  \| || |  _ \___ \
@@ -37,7 +36,6 @@ seed                = [      5,       19,   837]
 step     = 10
 strength = 16
 life     = 75
-
 
 #   ____  _         _     ____   ____   _____  ____  
 #  / ___|| |       / \   / ___| / ___| | ____|/ ___| 
@@ -136,31 +134,28 @@ def sqr(x):
 def map_direction(step_len, dir):
         # Number of possible cells for a given step length
         targets = step_len * 8
-
         # The circle is divided into N sectors based on the number of targets
         sector_len = 360 / targets
-
         # The sectors are shifted backwards to align with the positions of the cells
         sector_offset = math.floor(sector_len / 2)
-
         # Sectors must be aligned with pixels positions and shifted back
         # Therefore the second half of a sector ends up in the next one
         corrected_dir = dir + sector_offset
-
         # Sector numbering starts at 0
         target_cell = math.floor((corrected_dir % 360)/ sector_len)
-
         return target_cell, targets
 
-# Calculate the coordinates of the pixel for the next step
+# Calculates the coordinates of the next pixel/cell based on the current position
+# the step length, and the direction
 def next_cell_coords(x, y, step_len, dir):
+        # Ensure the step length is positive
         assert step_len>0
-
+        # Map the step length and direction to the target cell 
         target_cell, targets = map_direction(step_len, dir)
-
+        # Create an Axes object to manage the various directions and diagonals
         axes = Axes(step_len)
-        
-        # Check on axes and diagonals
+        # Match the 'target_cell' value to check if the movement 
+        # is along an axis or a diagonal
         match target_cell:
                 case axes.up:
                         y -= step_len
@@ -191,15 +186,20 @@ def next_cell_coords(x, y, step_len, dir):
                         y -= step_len
                         return x, y
 
-        # Check on pixels between axes and diagonals
+        # If the direction doesn't fall directly on an axis or diagonal, check intermediate pixel values
+        # Loop through the values of 'axes.list' to find the range between axis/diagonal values
         for i in axes.list:
                 if i==0:
+                        # Check the range between the last item in the list and the current target
                         check = range(axes.list[-1] + 1, targets)
                 else:
+                        # Check the range between the previous item and the current axis/diagonal value
                         check = range(axes.list[axes.list.index(i)-1]+1, i)
-                
+                        
+                # Loop through the 'check' range to find where 'target_cell' lies between axes or diagonals
                 for j in check:
                         if target_cell==j:
+                                # Match the current axis/diagonal and adjust the coordinates accordingly
                                 match i:
                                         case axes.up:
                                                 x -= targets - j
@@ -234,36 +234,15 @@ def next_cell_coords(x, y, step_len, dir):
                                                 y -= j - i + step_len
                                                 return x, y
 
+# Return true if the position (y,x) corresponds to a wall in the map_matrix
 def wall_hit(map_matrix, pos):
-        if map_matrix[pos[1]][pos[0]]==1:
+        if map_matrix[pos[1]][pos[0]]==1: # 1 = black
                 return True
-
         return False
 
+# Check if the pixel color matches or not the 'color'
 def check_pixel_color(surface, pixel, color, is_not=False):
         if is_not:
                 return pygame.Surface.get_at(surface, pixel)[:3] != color
         else:
-                return pygame.Surface.get_at(surface, pixel)[:3] == color
-
-def zoom(window, center, zoom_factor):
-        zoom_size = (round(FULLSCREEN_W/zoom_factor), round(FULLSCREEN_H/zoom_factor))
-
-        # Define the rectangular zoom area.
-        # The center point of the area is the position where to zoom to.
-        # (e.g the cursor position):
-        zoom_area = pygame.Rect(0, 0, *zoom_size)
-        zoom_area.center = center
-
-        # Create a new pygame.Surface with the size of the zoom area
-        # and copy the region of the window to the surface, by using 'blit'
-        # where the area parameter is set to the zoom region:
-        zoom_surf = pygame.Surface(zoom_area.size)
-        zoom_surf.blit(window, (0, 0), zoom_area)
-
-        #Scale zoom_surf by either pygame.transform.scale() or pygame.transform.smoothscale():
-        zoom_surf = pygame.transform.smoothscale(zoom_surf, (FULLSCREEN_W, FULLSCREEN_H))
-
-        #Now zoom_surf has the same size as the window. .blit the surface to the window:
-        window.blit(zoom_surf, (0, 0))
-        pygame.display.update()
+                return pygame.Surface.get_at(surface, pixel)[:3] == color 

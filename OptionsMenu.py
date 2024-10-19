@@ -10,25 +10,27 @@ class OptionsMenu(Menu):
     def __init__(self, game):
         super().__init__(game)
 
-        # Get the list of states for this menu and set the current one
-        self.states = Assets.options_menu_states    # ['Game Volume', 'Music Volume',
-                                                    # 'Button Sound', 'Back']
-        self.default_state = 0
-        self.state  = self.states[self.default_state]
+        # Get the list of options available in the menu and set the default selected option
+        self.states = Assets.options_menu_states  # Options: ['Game Volume', 'Music Volume', 'Button Sound', 'Back']
+        self.default_state = 0  # Set the default state (first option)
+        self.state  = self.states[self.default_state] # Current selected state initialized to the default
         
-        # Define positions for the texts
+        # Define positions for displaying menu options
         self.align_left      = self.mid_w - 50
         self.align_right     = self.mid_w + 50
         self.subtitle_height = self.mid_h - 150
 
+        # Initialize X positions for menu options
         self.states_x = [self.align_left] * (len(self.states)-1)
-        self.states_x.append(self.mid_w)
+        self.states_x.append(self.mid_w) # The 'Back' option is centered
+        
+        # Initialize Y positions for menu options
         self.states_y = [self.mid_h - 40,    # Game Volume
                          self.mid_h,         # Music Volume
                          self.mid_h + 40,    # Button Sound
                          self.mid_h + 120]   # Back
         
-        # Set the initial and possible positions of the cursor
+        # Set the initial cursor offset and positions
         self.cursor_offset = -30
 
         self.cursor_x = [self.mid_w - 335 + self.cursor_offset,    # Game Volume
@@ -46,22 +48,22 @@ class OptionsMenu(Menu):
         # Load options from the configuration file
         self.load_options()
 
-        # Define slider positions
+        # Define positions for the volume slider
         self.slider_x, self.slider_y = self.align_right , self.states_y[0]
         self.max_slider_width        = 200
         self.slider_width            = int(self.max_slider_width * (self.volume / 200))
 
     # Display the Options menu
     def display(self):
-        self.run_display = True
+        self.run_display = True # Control variable to run the display loop
         
         while self.run_display:
-            # Check for inputs
+            # Check for inputs and handle menu navigation
             self.game.check_events()
             self.check_input()
             time.sleep(0.1)
 
-            # Set background
+            # Set background for the options menu
             self.game.display.blit(self.dark_background, (0, 0))
             
             # Display sound and volume options
@@ -72,7 +74,7 @@ class OptionsMenu(Menu):
                            Assets.Fonts['BIG'].value,
                            Assets.Colors['WHITE'].value,
                            Assets.RectHandle['MIDTOP'].value)
-            # VOICES
+            # OPTIONS
             self.draw_text('Game volume', 25,
                            self.states_x[0],
                            self.states_y[0],
@@ -121,7 +123,7 @@ class OptionsMenu(Menu):
             
             self.game.blit_screen()
             
-            # Reset state and cursor position
+            # Reset state and cursor position if the menu is closed
             if self.run_display==False:
                 self.state = self.states[self.default_state]
                 self.cursor_pos = [self.cursor_x[self.default_state],
@@ -136,16 +138,15 @@ class OptionsMenu(Menu):
         pygame.draw.rect(self.game.display, Assets.Colors['GREEN'].value,
                          (self.slider_x, self.slider_y - 8, self.slider_width, 20))
         
-    # Handle user input
+    # Handle user input for navigating the options menu
     def check_input(self):
-        # Check if the player wants to move the cursor
-        [self.cursor_pos, self.state] = self.move_cursor(self.states, self.state, self.cursor_pos,
-                                                         self.cursor_x, self.cursor_y)
+        # Update cursor position based on user navigation
+        [self.cursor_pos, self.state] = self.move_cursor(self.states, self.state, self.cursor_pos,self.cursor_x, self.cursor_y)
         
-        # Get the pressed keys
+        # Get currently pressed keys for input handling
         keys = pygame.key.get_pressed()
 
-        # Go back to the Main menu
+        # Check if the player wants to go back to the main menu
         if self.game.BACK_KEY or (self.game.START_KEY and self.state == 'Back'):
             self.save_options()
             self.play_button(self.button_sound)
@@ -153,10 +154,11 @@ class OptionsMenu(Menu):
             self.run_display = self.to_main_menu()
             return
         
-        # Set the value of the current option
+        # Handle setting values based on the current menu option
         if self.game.START_KEY:
             self.play_button(self.button_sound)
 
+            # Toggle music volume on/off
             match self.state, self.sound_on_off:
                 case 'Music Volume', 'on':
                     mix.music.stop()
@@ -166,52 +168,51 @@ class OptionsMenu(Menu):
                     mix.music.play(-1)
                     self.sound_on_off = 'on'
                     return
-            
+                
+            # Toggle button sound on/off
             if self.state == 'Button Sound':
                 self.button_sound = 'off' if self.button_sound == 'on' else 'on'
                 return
         
-        # Turn down the volume
+        # Handle volume adjustment using left/right arrow keys
         if self.state == 'Game Volume' and keys[pygame.K_LEFT]:
             self.volume_down()
             self.play_button(self.button_sound)
             return
-
-        # Turn up the volume
         if self.state == 'Game Volume' and keys[pygame.K_RIGHT]:
             self.volume_up()
             self.play_button(self.button_sound)
     
-    # Increase the volume
+    # Increase the volume and update the slider
     def volume_up(self):
-        # Set the new volume value (up to a maximum)
+        # Increase the volume value, ensuring it doesn't exceed the maximum
         self.volume = min(self.volume + 20, 200)
 
-        # Update slider bar length
+        # Update slider width based on new volume
         self.slider_width = int(self.max_slider_width * (self.volume / 200))
 
-        # Set the new volume
+        # Set the new volume for the mixer and button sounds
         mix.music.set_volume(self.volume/400)
         self.button.set_volume(self.volume/400)
 
-    # Decrease the volume
+    # Decrease the volume and update the slider
     def volume_down(self):
-        # Set the new volume value (up to a maximum)
+        # Decrease the volume value, ensuring it doesn't fall below zero
         self.volume = max(self.volume -20, 0)
 
-        # Update slider bar length
+        # Update slider width based on new volume
         self.slider_width = int(self.max_slider_width * (self.volume / 200))
 
-        # Set the new volume
+        # Set the new volume for the mixer and button sounds
         mix.music.set_volume(self.volume/400)
         self.button.set_volume(self.volume/400)
                  
-    # Load from file or initialise options
+    # Load options from configuration file or set defaults if not available
     def load_options(self):
-        # Set configuration file path
+        # Set the path for the configuration file
         config_path = (os.path.join(Assets.GAME_DIR, 'GameConfig', 'options.ini'))  
         
-        # Initialise options for the very first time
+        # Initialize default options if the configuration file does not exist
         if not os.path.exists(config_path):
             self.volume       = 100
             self.sound_on_off = 'on'
@@ -222,17 +223,17 @@ class OptionsMenu(Menu):
         config = configparser.ConfigParser()
         config.read(config_path)
         
-        # Get the option values or set default values if not available in the config file
+        # Get option values from the config file or set defaults if not available
         self.volume       = config.getint('Options', self.states[0], fallback=100)
         self.sound_on_off = config.get('Options', self.states[1], fallback='on')
         self.button_sound = config.get('Options', self.states[2], fallback='on')
         
-        # Set the volume based on the configuration file value
+        # Set the music volume based on the loaded configuration value
         mix.music.set_volume(self.volume / 400) 
 
-    # Save selected options
+    # Save selected options to the configuration file
     def save_options(self):
-        # Set configuration file path
+        # Set the path for the configuration file
         config_path = (os.path.join(Assets.GAME_DIR, 'GameConfig', 'options.ini'))  
         config      = configparser.ConfigParser()
         
@@ -243,6 +244,6 @@ class OptionsMenu(Menu):
             'Button sound': self.button_sound
         }
         
-        # Create or overwrite the file
+        # Create or overwrite the configuration file with the new values
         with open(config_path, 'w') if os.path.isfile(config_path) else open(config_path, 'a') as configfile:
             config.write(configfile)

@@ -7,56 +7,58 @@ from Menu import Menu
 
 class MainMenu(Menu):
     def __init__(self, game):
+        # Initialize the base class (Menu)
         super().__init__(game)
 
-        # Get the list of states for this menu and set the current one
-        self.states = Assets.main_menu_states   # ['Start', 'Options',
-                                                # 'Credits', 'Exit']
-        self.state   = self.states[0]
+        # Get the list of menu states and set the current state
+        self.states = Assets.main_menu_states  # Menu options: ['Start', 'Options', 'Credits', 'Exit']
+        self.state   = self.states[0] # Initialize the first state as the current state
 
-        # Get game options
+        # Retrieve game options from the game instance
         self.options = game.options
         
-        # Define positions for the texts
+        # Define text positions for the menu items
         self.align_left      = self.mid_w - 485
         self.title_height    = self.mid_h - 250
         self.subtitle_height = self.mid_h - 100
-
+        
+        # Initialize x and y positions for each menu item
         self.states_x = [self.align_left] * len(self.states)
         self.states_y = [self.mid_h - 20,    # Start
                          self.mid_h + 20,    # Options
                          self.mid_h + 60,    # Credits
                          self.mid_h + 100]   # Exit
         
-        # Set the initial and possible positions of the cursor and it's offset
+        # Set the initial position of the cursor and its offset
         self.cursor_offset = -25
 
+        # Initialize cursor positions for each menu item
         self.cursor_x = [self.states_x[0] + self.cursor_offset] * len(self.states)
         self.cursor_y = [self.states_y[0],    # Start
                          self.states_y[1],    # Options
                          self.states_y[2],    # Credits
-                         self.states_y[3]]   # Exit
+                         self.states_y[3]]    # Exit
         
         self.cursor_pos = [self.cursor_x[0], self.cursor_y[0]]
 
     # Display the Main menu
     def display(self):
-        self.run_display = True
+        self.run_display = True # Flag to keep the menu running
         
-        # Initialize the mixer module for audio
+        # Initialize the mixer module for audio playback
         mix.init()
         
-        # Play the ambient music if the options allow it
+        # Play ambient music if the options allow it and no music is currently playing
         if self.options.sound_on_off == 'on' and not mix.music.get_busy():
-            mix.music.play(-1)
+            mix.music.play(-1) # Play music indefinitely
         
         while self.run_display:
-            # Check for inputs
+            # Check for user inputs
             self.game.check_events()
             self.check_input()
-            time.sleep(0.05)
+            time.sleep(0.05) # Small delay to control the frame rate
 
-            # Set the background
+            # Set the background for the menu
             self.game.display.blit(self.background,(0,0))
             
             # Set the positions on the screen
@@ -67,7 +69,7 @@ class MainMenu(Menu):
                            Assets.Fonts['BIG'].value,
                            Assets.Colors['EUCALYPTUS'].value,
                            Assets.RectHandle['MIDLEFT'].value)
-            # VOICES
+            # MENU OPTIONS
             self.draw_text('Main Menu', 50,
                            self.align_left,
                            self.subtitle_height,
@@ -108,13 +110,13 @@ class MainMenu(Menu):
 
             self.game.blit_screen()
             
-    # Handle user input
+    # Handle user input for menu navigation
     def check_input(self):
-        # Check if the player wants to move the cursor
+        # Move the cursor based on player input
         [self.cursor_pos, self.state] = self.move_cursor(self.states, self.state, self.cursor_pos,
                                                          self.cursor_x, self.cursor_y)
         
-        # Reach the selected menu
+        # Determine what happens when the player selects an option
         if self.game.START_KEY:
             match self.state:
                 case 'Start':

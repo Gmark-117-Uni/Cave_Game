@@ -11,21 +11,19 @@ from MissionControl import MissionControl
 
 class Game():
     def __init__(self):
+        # Center the game window on the screen
         os.environ['SDL_VIDEO_CENTERED'] = '1'
-
-        # Initialise pygame features
+        # Initialize all Pygame modules
         pygame.init()
-        
-        # If we run the game we are not necessary playing
+        # Set game state variables: running and playing
         self.running, self.playing = True, False
-        
-        # Initialise key flags to navigate in the menu
+        # Initialize key flags to handle menu navigation
         self.UP_KEY,   self.DOWN_KEY, self.START_KEY = False, False, False
         self.BACK_KEY, self.LEFT_KEY, self.RIGHT_KEY = False, False, False
-        
+        # Set the window to windowed mode
         self.to_windowed()
 
-        # Initialise each menu and set the current one
+        # Initialize each menu and set the current one to the main menu
         self.options         = OptionsMenu(self)
         self.main_menu       = MainMenu(self)
         self.credits         = CreditsMenu(self)
@@ -42,11 +40,11 @@ class Game():
     # Run the simulation
     def game_loop(self):
         if self.playing:
-            # Settings : [Mode, Map Dimension, Seed, Drone Number, Scan Mode]
+            # Get simulation settings: [Mode, Map Dimension, Seed, Drone Number, Scan Mode]
             self.sim_settings  = self.simulation.get_sim_settings()
-            # Generate the cave
+            # Generate the cave map
             self.cartographer = MapGenerator(self, True) # True=Prefab Map, False=Generate Map
-            # Prep and Start the mission
+            # Prepare and start the mission control
             self.mission_control = MissionControl(self)
 
 
@@ -58,7 +56,7 @@ class Game():
 
     # Check player inputs
     def check_events(self):
-        # Get the input
+        # Retrieve input events
         for event in pygame.event.get():
             match event.type:
                 # If the player clicks the x on top of the window exit the game
@@ -66,9 +64,7 @@ class Game():
                     pygame.quit()
                     sys.exit()
                 
-                # If the player clicks something on the keyboard
-                # they can go up or down with the arrows or
-                # they can select with ENTER and go back with BACKSPACE
+                # If a keyboard key is pressed, update corresponding flags
                 case pygame.KEYDOWN:
                     match event.key:
                         case pygame.K_RETURN:
@@ -84,7 +80,7 @@ class Game():
                         case pygame.K_RIGHT:
                             self.RIGHT_KEY = True
                     
-    # Reset pushed key flags
+    # Reset pushed key flags to prevent multiple triggers
     def reset_keys(self):
         self.UP_KEY,   self.DOWN_KEY, self.START_KEY = False, False, False
         self.BACK_KEY, self.LEFT_KEY, self.RIGHT_KEY = False, False, False
@@ -96,46 +92,42 @@ class Game():
     # | |  | | / ___ \ | |\  | / ___ \ | |_| || |___     | |_| | | |  ___) ||  __/ | |___  / ___ \   | |
     # |_|  |_|/_/   \_\|_| \_|/_/   \_\ \____||_____|    |____/ |___||____/ |_|    |_____|/_/   \_\  |_|
 
-    # Update the display
+    # Update the display by blitting the current surface to the window
     def blit_screen(self):
         self.window.blit(self.display, (0, 0))
         pygame.display.update()
-        self.reset_keys()
+        self.reset_keys() # Reset key flags for the next frame
     
-    # Maximise the window
+    # Maximize the game window to full screen
     def to_maximised(self):
-        # Choose and set window dimensions
+        # Choose and set window dimensions for full screen
         self.width = Assets.FULLSCREEN_W
         self.height = Assets.FULLSCREEN_H
 
-        # Initialise window
+        # Initialize the display surface
         self.display = pygame.Surface((self.width,self.height))
         self.window = pygame.display.set_mode((self.width,self.height), pygame.SCALED)
         
-        # Set window title
+        # Set the window title
         pygame.display.set_caption('Cave Game')
 
-        # Set game icon
+        # Set the game icon
         pygame.display.set_icon(pygame.image.load(Assets.Images['GAME_ICON'].value))
-        # pygame.display.set_icon(pygame.image.load(Assets.Images['GAME_ICON_BG'].value))
-
         return self.display
 
     # Return to the originial window dimensions
     def to_windowed(self):
-        # Choose and set window dimensions
+        # Choose and set window dimensions for windowed mode
         self.width = Assets.DISPLAY_W
         self.height = Assets.DISPLAY_H
 
-        # Initialise window
+        # Initialize the display surface
         self.display = pygame.Surface((self.width,self.height))
         self.window  = pygame.display.set_mode((self.width,self.height), pygame.SCALED)
 
-        # Set window title
+        # Set the window title
         pygame.display.set_caption('Cave Game')
 
-        # Set game icon
+        # Set the game icon
         pygame.display.set_icon(pygame.image.load(Assets.Images['GAME_ICON'].value))
-        # pygame.display.set_icon(pygame.image.load(Assets.Images['GAME_ICON_BG'].value))
-
         return self.display

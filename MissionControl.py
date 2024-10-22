@@ -6,7 +6,7 @@ import math
 import threading
 import Assets
 from Drone import Drone
-#from Rover import Rover
+from Rover import Rover
 
 class MissionControl():
     def __init__(self, game):
@@ -36,30 +36,12 @@ class MissionControl():
         self.start_point = None
         self.set_start_point()
 
-        # DRONE INITIALISATION
-        self.num_drones = self.settings[3]
-        # Set drone icon
-        icon_size = self.get_icon_dim()
-        
-        self.drone_icon = pygame.image.load(Assets.Images['DRONE'].value)
-        self.drone_icon = pygame.transform.scale(self.drone_icon, icon_size)
-
-        # List to store drone colors
-        self.colors = list(Assets.DroneColors)
-
-        # Build the drones and show them and the map at step 0
+        # Build the drones and the rovers
         self.build_drones()
-        self.draw_cave()
+        self.build_rovers()
+
+        # Print them on the map
         self.draw()
-
-        # ROVER INITIALISATION
-        self.num_rovers = math.ceil(self.settings[3]/4)
-        # Set drone icon
-        self.rover_icon = pygame.image.load(Assets.Images['ROVER'].value)
-        self.rover_icon = pygame.transform.scale(self.rover_icon, (50,50))
-
-        # List to store rover colors (Deprecated: Rovers don't need colors)
-        self.colors = [Assets.Colors['GREY'].value, Assets.Colors['RED'].value]
 
         # Show the map and the robots at step 0 for 1 second
         pygame.display.update()
@@ -71,15 +53,13 @@ class MissionControl():
         # Start mission
         self.start_mission()
 
-    #  __  __ _____  _____ _____ _____ ____  _   _    _____ ____  _   _ _______ _____   ____  _      
-    # |  \/  |_   _|/ ____/ ____|_   _/ __ \| \ | |  / ____/ __ \| \ | |__   __|  __ \ / __ \| |     
-    # | \  / | | | | (___| (___   | || |  | |  \| | | |   | |  | |  \| |  | |  | |__) | |  | | |     
-    # | |\/| | | |  \___ \\___ \  | || |  | | . ` | | |   | |  | | . ` |  | |  |  _  /| |  | | |     
-    # | |  | |_| |_ ____) |___) |_| || |__| | |\  | | |___| |__| | |\  |  | |  | | \ \| |__| | |____ 
-    # |_|  |_|_____|_____/_____/|_____\____/|_| \_|  \_____\____/|_| \_|  |_|  |_|  \_\\____/|______|
-    
-    def start_mission(self):
+#  __  __  ___  ____   ____   ___   ___   _   _      ____   ___   _   _  _____  ____    ___   _     
+# |  \/  ||_ _|/ ___| / ___| |_ _| / _ \ | \ | |    / ___| / _ \ | \ | ||_   _||  _ \  / _ \ | |
+# | |\/| | | | \___ \ \___ \  | | | | | ||  \| |   | |    | | | ||  \| |  | |  | |_) || | | || |
+# | |  | | | |  ___) | ___) | | | | |_| || |\  |   | |___ | |_| || |\  |  | |  |  _ < | |_| || |___
+# |_|  |_||___||____/ |____/ |___| \___/ |_| \_|    \____| \___/ |_| \_|  |_|  |_| \_\ \___/ |_____|
 
+    def start_mission(self):
         # Start timer
         tic = time.perf_counter()
 
@@ -104,7 +84,6 @@ class MissionControl():
             self.completed = self.is_mission_over()
 
             # Redraw the cave and the drones at each frame
-            self.draw_cave()
             self.draw()
 
             pygame.display.update()
@@ -135,13 +114,12 @@ class MissionControl():
                 return False
         
         return True
-    
-    #  _____  _____   ____  _   _ ______  
-    # |  __ \|  __ \ / __ \| \ | |  ____|
-    # | |  | | |__) | |  | |  \| | |__  
-    # | |  | |  _  /| |  | | . ` |  __|  
-    # | |__| | | \ \| |__| | |\  | |____ 
-    # |_____/|_|  \_\\____/|_| \_|______|
+
+#  ____   ____    ___   _   _  _____ 
+# |  _ \ |  _ \  / _ \ | \ | || ____|
+# | | | || |_) || | | ||  \| ||  _|
+# | |_| ||  _ < | |_| || |\  || |___
+# |____/ |_| \_\ \___/ |_| \_||_____|
 
     # Thread function for each drone's movement
     def drone_thread(self, drone_id):
@@ -151,45 +129,35 @@ class MissionControl():
 
     # Instantiate the swarm of drones as a list
     def build_drones(self):
+        # Get the required number of drones from the settings
+        self.num_drones = self.settings[3]
+
+        # Set drone icon
+        icon_size       = self.get_drone_icon_dim()
+        self.drone_icon = pygame.image.load(Assets.Images['DRONE'].value)
+        self.drone_icon = pygame.transform.scale(self.drone_icon, icon_size)
+
+        # List to store drone colors
+        self.drone_colors = list(Assets.DroneColors)
+
         # Populate the swarm
         self.drones = []
         for i in range(self.num_drones):
-            self.drones.append(Drone(self.game, self, i, self.start_point, self.choose_color(), self.drone_icon, self.map_matrix))
+            self.drones.append(Drone(self.game, self, i, self.start_point, self.choose_drone_color(), self.drone_icon, self.map_matrix))
 
     # Function to get a random color for each drone
-    def choose_color(self):     
+    def choose_drone_color(self):     
         # Choose a random color from the list, then remove it
-        random_color = rand.choice(self.colors)
-        self.colors.remove(random_color)
+        random_color = rand.choice(self.drone_colors)
+        self.drone_colors.remove(random_color)
         return random_color.value
 
     # Return the dimension of the drone icon given the map dimension
-    def get_icon_dim(self):
+    def get_drone_icon_dim(self):
         match self.settings[1]:
             case 'SMALL' : return Assets.drone_icon_options[0]
             case 'MEDIUM': return Assets.drone_icon_options[1]
             case 'BIG'   : return Assets.drone_icon_options[2]
-
-    # Remove the drones drawn in the last positions
-    def draw_cave(self):
-        # Draw the CAVE_MAP image onto the game window
-        self.game.window.blit(self.cave_png, (0, 0))
-
-    # Blit the cave walls
-    def draw_walls(self, first_time=True):
-        if first_time:
-            # The walls cover everything but the drone icon
-            self.game.window.blit(self.cave_walls_png, (0, 0))
-
-    # Draw everything in layers: (Lowest layer) 0 -> 3 (Highest layer)
-    def draw(self):
-        for i in range(4):
-            for j in range(self.num_drones):
-                match i:
-                    case 0: self.drones[j].draw_vision()
-                    case 1: self.drones[j].draw_path()
-                    case 2: self.draw_walls() if j==0 else self.draw_walls(False)
-                    case 3: self.drones[j].draw_icon()
 
     def pool_information(self):
         for i in range(self.drones):
@@ -198,9 +166,73 @@ class MissionControl():
         for i in range(self.drones):
             self.drones[i].update_explored_map()
 
-    #  _____   ______      ________ _____  
-    # |  __ \ / __ \ \    / /  ____|  __ \ 
-    # | |__) | |  | \ \  / /| |__  | |__) |
-    # |  _  /| |  | |\ \/ / |  __| |  _  / 
-    # | | \ \| |__| | \  /  | |____| | \ \ 
-    # |_|  \_\\____/   \/   |______|_|  \_\
+#  ____    ___  __     __ _____  ____  
+# |  _ \  / _ \ \ \   / /| ____||  _ \
+# | |_) || | | | \ \ / / |  _|  | |_) |
+# |  _ < | |_| |  \ V /  | |___ |  _ <
+# |_| \_\ \___/    \_/   |_____||_| \_\
+
+    # Instantiate the fleet of rovers as a list
+    def build_rovers(self):
+        # Get the number of rovers depending on the number of drones
+        self.num_rovers = math.ceil(self.settings[3]/4)
+
+        # Set rover icon
+        icon_size       = self.get_rover_icon_dim()
+        self.rover_icon = pygame.image.load(Assets.Images['ROVER'].value)
+        self.rover_icon = pygame.transform.scale(self.rover_icon, icon_size)
+
+        # List to store rover colors (Deprecated: Rovers don't need colors)
+        self.rover_colors = list(Assets.RoverColors)
+
+        # Populate the swarm
+        self.rovers = []
+        for i in range(self.num_rovers):
+            self.rovers.append(Rover(self.game, self, i, self.start_point, self.choose_rover_color(), self.rover_icon, self.map_matrix))
+    
+    # Function to get a random color for each drone
+    def choose_rover_color(self):     
+        # Choose a random color from the list, then remove it
+        random_color = rand.choice(self.rover_colors)
+        self.rover_colors.remove(random_color)
+        return random_color.value
+
+    # Return the dimension of the drone icon given the map dimension
+    def get_rover_icon_dim(self):
+        match self.settings[1]:
+            case 'SMALL' : return Assets.rover_icon_options[0]
+            case 'MEDIUM': return Assets.rover_icon_options[1]
+            case 'BIG'   : return Assets.rover_icon_options[2]
+
+#  ____   ____      _  __        __ ___  _   _   ____ 
+# |  _ \ |  _ \    / \ \ \      / /|_ _|| \ | | / ___|
+# | | | || |_) |  / _ \ \ \ /\ / /  | | |  \| || |  _
+# | |_| ||  _ <  / ___ \ \ V  V /   | | | |\  || |_| |
+# |____/ |_| \_\/_/   \_\ \_/\_/   |___||_| \_| \____|
+
+    # Remove the icons drawn in the last positions
+    def draw_cave(self):
+        # Draw the CAVE_MAP image onto the game window
+        self.game.window.blit(self.cave_png, (0, 0))
+
+    # Blit the cave walls
+    def draw_walls(self):
+        # The walls cover everything but the drone icon
+        self.game.window.blit(self.cave_walls_png, (0, 0))
+
+    # Draw everything in layers: (Lowest layer) 0 -> 3 (Highest layer)
+    def draw(self):
+        self.draw_cave()
+
+        for i in range(4):
+            for j in range(self.num_drones):
+                match i:
+                    case 0: self.drones[j].draw_vision()
+                    case 1: self.drones[j].draw_path()
+                    case 2:
+                        if j==0:
+                            self.draw_walls()
+                    case 3:
+                        self.drones[j].draw_icon()
+                        if j < len(self.rovers):
+                            self.rovers[j].draw_icon()

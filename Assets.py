@@ -31,6 +31,7 @@ scan_options        = ['Radar', 'Lidar']
 map_options         = ["Small", "Medium", "Big"]
 vision_options      = [     39,       19,     4]
 drone_icon_options  = [(30,30),  (10,10), (1,1)]
+rover_icon_options  = [(40,40),  (15,15), (5,5)]
 seed                = [      5,       19,   837]
 
 # Map Generator Inputs
@@ -70,6 +71,11 @@ class DroneColors(Enum):
         ORANGE       = (255, 128,   0)
         RED          = (255,   0,   0)
         BROWN        = (165,  42,  42)
+
+class RoverColors(Enum):
+        RED          = (255,   0,   0)
+        GREEN        = ( 51, 255,  51)
+        BLUE         = (  0,   0, 153)
         
 class Fonts(Enum):
         BIG          = os.path.join(GAME_DIR, 'Assets', 'Fonts', 'Cave-Stone.ttf')  

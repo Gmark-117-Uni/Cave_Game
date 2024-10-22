@@ -8,11 +8,11 @@ from AStar import AStar
 
 
 class Drone():
-    def __init__(self, game, manager, id, start_pos, color, icon, cave, strategy="random"):
+    def __init__(self, game, control, id, start_pos, color, icon, cave, strategy="random"):
         self.game         = game
         self.settings     = game.sim_settings
         self.cave         = cave
-        self.manager      = manager
+        self.control      = control
         self.strategy     = strategy
          
         self.id           = id # Unique identifier of the drone
@@ -29,7 +29,7 @@ class Drone():
         self.floor_surf   = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
         self.floor_surf.fill((*Colors.WHITE.value, 0))
         self.ray_points   = []  # Initialize the list for rays
-        self.delay        = self.manager.delay
+        self.delay        = self.control.delay
 
         self.show_path       = True
         self.speed_factor    = 4

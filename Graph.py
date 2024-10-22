@@ -48,15 +48,18 @@ class Graph():
                 return True
 
             # Check if the second node has been reached (No collisions)
-            if x1==x2 and y1==y2: return False
+            if x1==x2 and y1==y2:
+                return False
 
             # Move to next pixel
             err2 = 2*error
             if err2 >= dy:
-                if x1==x2: return False
+                if x1==x2:
+                    return False
                 error += dy
                 x1 += sx
             if err2 <= dx:
-                if y1==y2: return False
+                if y1==y2:
+                    return False
                 error += dx
                 y1 += sy

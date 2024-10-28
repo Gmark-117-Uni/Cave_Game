@@ -9,11 +9,11 @@ from Assets import sqr, next_cell_coords
 from multiprocessing import Process
 
 class MapGenerator():
-    def __init__(self, game, prefab=False):
+    def __init__(self, game):
         self.game     = game
         self.settings = game.sim_settings
         self.surface  = game.display
-        self.width    = Assets.FULLSCREEN_W - 300
+        self.width    = Assets.FULLSCREEN_W - Assets.LEGEND_WIDTH
         self.height   = Assets.FULLSCREEN_H
         
         # Set the seed
@@ -27,7 +27,7 @@ class MapGenerator():
         self.border_thck  = 50
         self.set_starts()
 
-        if not prefab:
+        if not self.settings[4]:
             # Initialise the map and generate worms to eat it simultaneously
             self.bin_map = np.ones([self.height,self.width])
             self.dig_map(self.proc_num)

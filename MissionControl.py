@@ -5,6 +5,7 @@ import sys
 import math
 import threading
 import Assets
+from ControlCenter import ControlCenter
 from Drone import Drone
 from Rover import Rover
 
@@ -28,6 +29,9 @@ class MissionControl():
         # Exploration is 0 / Search&Rescue is 1
         self.mission   = self.settings[0]
         self.completed = False
+
+        # Initialise control center for displaying mission status
+        self.control_center = ControlCenter(game, self.settings[3])
 
         # Maximise the game window
         self.game.display = self.game.to_maximised()
@@ -85,9 +89,7 @@ class MissionControl():
 
             # Redraw the cave and the drones at each frame
             self.draw()
-
             pygame.display.update()
-            time.sleep(self.delay)
 
         # Set the mission event to signal all threads to stop
         self.mission_event.set()
@@ -125,7 +127,9 @@ class MissionControl():
     def drone_thread(self, drone_id):
         while not self.mission_event.is_set() and not self.drones[drone_id].mission_completed():
             self.drones[drone_id].move()  # Move the drone
-            time.sleep(self.delay)  # Control the speed of movement
+
+            # Control the speed of movement
+            time.sleep(self.delay)
 
     # Instantiate the swarm of drones as a list
     def build_drones(self):
@@ -143,14 +147,13 @@ class MissionControl():
         # Populate the swarm
         self.drones = []
         for i in range(self.num_drones):
-            self.drones.append(Drone(self.game, self, i, self.start_point, self.choose_drone_color(), self.drone_icon, self.map_matrix))
-
-    # Function to get a random color for each drone
-    def choose_drone_color(self):     
-        # Choose a random color from the list, then remove it
-        random_color = rand.choice(self.drone_colors)
-        self.drone_colors.remove(random_color)
-        return random_color.value
+            self.drones.append(Drone(self.game,
+                                     self,
+                                     i,
+                                     self.start_point,
+                                     self.drone_colors.pop(0).value,
+                                     self.drone_icon,
+                                     self.map_matrix))
 
     # Return the dimension of the drone icon given the map dimension
     def get_drone_icon_dim(self):
@@ -236,3 +239,5 @@ class MissionControl():
                         self.drones[j].draw_icon()
                         if j < len(self.rovers):
                             self.rovers[j].draw_icon()
+        
+        self.control_center.draw_control_center()

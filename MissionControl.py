@@ -65,7 +65,7 @@ class MissionControl():
 
     def start_mission(self):
         # Start timer
-        tic = time.perf_counter()
+        self.control_center.start_timer()
 
         # Create and start a thread for each drone's movement
         threads = []
@@ -97,10 +97,6 @@ class MissionControl():
         # Wait for all threads to complete
         for t in threads:
             t.join()
-
-        # Check timer
-        toc = time.perf_counter()
-        print(f"Mission completed in {toc-tic} seconds")
         
     # Among the starting positions of the worms, find one that is viable
     def set_start_point(self):

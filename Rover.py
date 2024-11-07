@@ -59,7 +59,7 @@ class Rover():
 # | |_| ||  _ <  / ___ \ \ V  V /   | | | |\  || |_| |
 # |____/ |_| \_\/_/   \_\ \_/\_/   |___||_| \_| \____|
 
-    # Draw the drone icon
+    # Draw the rover icon
     def draw_icon(self):
         icon_width, icon_height = self.icon.get_size()  # Get dimensions of the icon
         icon_position = (int(self.pos[0] - icon_width // 2), int(self.pos[1] - icon_height // 2))  # Center the icon

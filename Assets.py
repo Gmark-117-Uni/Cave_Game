@@ -75,7 +75,7 @@ class DroneColors(Enum):
 
 class RoverColors(Enum):
         RED          = (220,   0,   0)   # Huey
-        BLUE         = (  0,   0, 220)   # Dewey
+        BLUE         = (  0,   0, 255)   # Dewey
         GREEN        = (  0, 128,   0)   # Louie
         
 class Fonts(Enum):

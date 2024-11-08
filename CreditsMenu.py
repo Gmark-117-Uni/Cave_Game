@@ -2,24 +2,32 @@ import Assets
 from Menu import Menu
 
 class CreditsMenu(Menu):
+    
     def __init__(self, game):
+        # Call the parent Menu's __init__ method to initialize common properties
         super().__init__(game)
 
-        # Define positions for the texts
+        # Define positions for the title and credits text on the screen
         self.subtitle_height  = self.mid_h - 150
-        self.states_y         = [self.mid_h - 60, self.mid_h - 10, self.mid_h + 40, self.mid_h + 140]
+        self.states_y         = [self.mid_h - 60, 
+                                 self.mid_h - 10, 
+                                 self.mid_h + 40, 
+                                 self.mid_h + 140]
         
-        # Set the position of the cursor
+        # Set the position for the cursor
         self.cursor_pos = [self.mid_w - 75, self.states_y[3]]
 
     def display(self):
+        # Variable to control the display loop
         self.run_display = True
 
         while self.run_display:
-            # Check for inputs
+            # Check for user inputs (start or back keys)
             self.game.check_events()
             if self.game.START_KEY or self.game.BACK_KEY:
+                # Play a button sound when a key is pressed
                 self.play_button(self.game.options.button_sound)
+                # Exit the credits screen and return to the main menu
                 self.run_display = self.to_main_menu()
             
             # Set background

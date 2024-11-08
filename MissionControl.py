@@ -15,20 +15,19 @@ class MissionControl():
         rand.seed(game.sim_settings[2])
 
         self.game         = game
-        self.settings     = game.sim_settings
+        self.settings     = game.sim_settings 
         self.cartographer = game.cartographer
-        self.map_matrix   = self.cartographer.bin_map
-        self.cave_png     = pygame.image.load(Assets.Images['CAVE_MAP'].value).convert_alpha()
+        self.map_matrix   = self.cartographer.bin_map # Get the binary map representation
+        self.cave_png     = pygame.image.load(Assets.Images['CAVE_MAP'].value).convert_alpha() # Load cave map image
         
-        self.delay = 1/15
+        self.delay = 1/15 # Set a delay for frame updates
 
-        # Black mask for borders
+        # Load cave wall images
         self.cave_walls_png = pygame.image.load(Assets.Images['CAVE_WALLS'].value).convert_alpha()
 
-        # Mission settings
-        # Exploration is 0 / Search&Rescue is 1
+        # Initialize mission settings (0 for exploration, 1 for search & rescue)
         self.mission   = self.settings[0]
-        self.completed = False
+        self.completed = False # Track whether the mission is completed
 
         # Initialise control center for displaying mission status
         self.control_center = ControlCenter(game, self.settings[3])
@@ -36,7 +35,7 @@ class MissionControl():
         # Maximise the game window
         self.game.display = self.game.to_maximised()
         
-        # Find a suitable start position
+        # Set the starting position for drones
         self.start_point = None
         self.set_start_point()
 
@@ -68,15 +67,16 @@ class MissionControl():
         self.control_center.start_timer()
 
         # Create and start a thread for each drone's movement
-        threads = []
+        threads = [] # List to keep track of all threads
         for i in range(self.num_drones):
             t = threading.Thread(target=self.drone_thread, args=(i,))
             threads.append(t)
             t.start()
 
-        # Keep moving the drones until the mission is completed
+        # Main loop to keep moving drones until the mission is completed
         while not self.completed:
             for event in pygame.event.get():
+                # If the window is closed
                 if event.type == pygame.QUIT:
                     # Set the mission event to signal all threads to stop
                     self.mission_event.set()
@@ -91,27 +91,29 @@ class MissionControl():
             self.draw()
             pygame.display.update()
 
-        # Set the mission event to signal all threads to stop
+        # Signal all threads to stop when the mission is complete
         self.mission_event.set()
 
-        # Wait for all threads to complete
+        # Wait for all threads to finish executing
         for t in threads:
             t.join()
         
     # Among the starting positions of the worms, find one that is viable
     def set_start_point(self):
-        # While point is BLACK or not initialised
+         # Continuously search for a valid starting point until one is found
         while self.start_point is None or Assets.wall_hit(self.map_matrix, self.start_point):
-            # Take one of the initial points of the worms as initial point for the drone
+            # Randomly select one of the initial points of the worms
             i = rand.randint(0,3)
             self.start_point = (self.cartographer.worm_x[i],self.cartographer.worm_y[i])
     
+    # Check if the mission is completed
     def is_mission_over(self):
+        # Check if all drones have completed their missions
         for drone in self.drones:
             if not drone.mission_completed():
                 return False
         
-        return True
+        return True # All drones are completed, mission is over
 
 #  ____   ____    ___   _   _  _____ 
 # |  _ \ |  _ \  / _ \ | \ | || ____|
@@ -121,6 +123,7 @@ class MissionControl():
 
     # Thread function for each drone's movement
     def drone_thread(self, drone_id):
+        # Continue moving the drone until mission event is set or the drone completes its mission
         while not self.mission_event.is_set() and not self.drones[drone_id].mission_completed():
             self.drones[drone_id].move()  # Move the drone
 
@@ -211,7 +214,7 @@ class MissionControl():
 
     # Remove the icons drawn in the last positions
     def draw_cave(self):
-        # Draw the CAVE_MAP image onto the game window
+        # Blit the cave map image onto the game window at (0, 0) position
         self.game.window.blit(self.cave_png, (0, 0))
 
     # Blit the cave walls
@@ -219,7 +222,7 @@ class MissionControl():
         # The walls cover everything but the drone icon
         self.game.window.blit(self.cave_walls_png, (0, 0))
 
-    # Draw everything in layers: (Lowest layer) 0 -> 3 (Highest layer)
+    # Draw all game elements in layers: (Lowest layer) 0 -> 3 (Highest layer)
     def draw(self):
         self.draw_cave()
 

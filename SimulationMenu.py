@@ -7,15 +7,14 @@ from Menu import Menu
 
 class SimulationMenu(Menu):
     def __init__(self, game):
-        super().__init__(game)
+        super().__init__(game) # Initialize the parent class with the game object
 
         # Get the list of states for this menu and set the current one
-        self.states = Assets.sim_menu_states    # ['Mode', 'Map Dimension', 'Seed', 'Drones',
-                                                #  'Prefab', 'Back', 'Start Simulation']
-        self.default_state = len(self.states) - 1
-        self.state  = self.states[self.default_state]
+        self.states = Assets.sim_menu_states # ['Mode', 'Map Dimension', 'Seed', 'Drones', 'Scan Mode', 'Back', 'Start Simulation']
+        self.default_state = len(self.states) - 1 # Index of the default state (last state)
+        self.state  = self.states[self.default_state] # Set the current state to the default
 
-        # Initialise the possible options and their iterators
+        # Initialize the possible options for the menu
         self.mode_options   = Assets.mode_options
         self.map_options    = Assets.map_options
         self.prefab_options = Assets.prefab_options
@@ -25,7 +24,7 @@ class SimulationMenu(Menu):
         self.n_drones = 3
         self.prefab   = 1
        
-        # Define positions for menu text
+        # Define positions for menu text alignment
         self.align_left      = self.mid_w - 50
         self.align_right     = self.mid_w + 50
         self.subtitle_height = self.mid_h - 170
@@ -43,6 +42,7 @@ class SimulationMenu(Menu):
         # Set the initial position of the cursor
         self.cursor_offset = -30
 
+        # Define x and y coordinates for cursor positioning corresponding to each state
         self.cursor_x = [self.align_left - 110 + self.cursor_offset,  # Mode
                          self.align_left - 310 + self.cursor_offset,  # Map Dimension
                          self.align_left -  95 + self.cursor_offset,  # Seed
@@ -58,32 +58,34 @@ class SimulationMenu(Menu):
                          self.states_y[5],  # Back
                          -100]              # Start Simulation
         
+        # Set initial cursor position based on the default state
         self.cursor_pos = [self.cursor_x[self.default_state],
                            self.cursor_y[self.default_state]]
 
         # Set the seed input cursor position
         self.input_cursor_offset = 25
 
-        # Set the seed input
+        # Set the initial seed input
         self.set_seed_input()
 
-        # Initialize the number input flag
+        # Initialize the number input flag to track number input
         self.number_input = False  
     
     # Display the Simulation menu
     def display(self):
-        self.run_display = True
+        self.run_display = True # Flag to control the display loop
 
+        # Main loop for displaying the menu
         while self.run_display:
-            # Check for inputs
+            # Check for player inputs
             self.game.check_events()
             self.check_input()
             time.sleep(0.05)
 
-            # Set background 
+            # Set background for the menu
             self.game.display.blit(self.dark_background,(0,0))
 
-            # Display sound and volume options
+            # Display the menu title and options
             # TITLE
             self.draw_text('Simulation Settings', 50,
                            self.mid_w,
@@ -91,7 +93,7 @@ class SimulationMenu(Menu):
                            Assets.Fonts['BIG'].value,
                            Assets.Colors['WHITE'].value,
                            Assets.RectHandle['CENTER'].value)
-            # VOICES
+            # OPTIONS
             self.draw_text('Mode', 25,
                            self.states_x[0],
                            self.states_y[0],
@@ -188,7 +190,7 @@ class SimulationMenu(Menu):
 
             self.game.blit_screen()
             
-            # Reset state and cursor position
+            # Reset state and cursor position when exiting the display
             if self.run_display==False:
                 self.state      = self.states[self.default_state]
                 self.cursor_pos = [self.cursor_x[self.default_state],
@@ -198,20 +200,20 @@ class SimulationMenu(Menu):
     def draw_input_cursor(self):
         # If the player is currently on the Seed option ...
         if self.state == 'Seed':
-            # ... Draw a cursor line to indicate the input field
+            # ... draw a cursor line to indicate the input field
             pygame.draw.line(self.game.display,
                              Assets.Colors['GREENDARK'].value,
                              (self.input_cursor_x, self.input_cursor_y),
                              (self.input_cursor_x + 20, self.input_cursor_y),
-                             4)
+                             4) # Draw a line representing the cursor
 
-    # Handle user input
+    # Handle user input for menu navigation
     def check_input(self):
         # Check if the player wants to move the cursor
         [self.cursor_pos, self.state] = self.move_cursor(self.states, self.state, self.cursor_pos,
                                                          self.cursor_x, self.cursor_y)
         
-        # Depending on the current option, delete the last input or go back to the Main menu
+        # Depending on the current option, delete the last input on seed or go back to the Main menu
         if self.game.BACK_KEY:
             self.play_button(self.game.options.button_sound)
             match self.state:
@@ -222,7 +224,7 @@ class SimulationMenu(Menu):
                     self.run_display = self.to_main_menu()
                     return
 
-        # Set the value of the current option
+        # Set the value of the current option based on user input
         if self.game.START_KEY:
             self.play_button(self.game.options.button_sound)
 
@@ -256,9 +258,9 @@ class SimulationMenu(Menu):
                 case 'Drones':
                     match self.n_drones:
                         case 8:
-                            self.n_drones = 3
+                            self.n_drones = 2
                         case _:
-                            self.n_drones += 1
+                            self.n_drones += 2
                     return
                 case 'Prefab':
                     self.prefab = 1 if self.prefab == 0 else 0
@@ -297,13 +299,13 @@ class SimulationMenu(Menu):
         if not any(pygame.key.get_pressed()):
             self.number_input = False
 
-    # Save selected options
+    # Save selected options to a configuration file
     def save_symSettings(self):
         # Set configuration file path
         config_path = (os.path.join(Assets.GAME_DIR, 'GameConfig', 'symSettings.ini'))  
         config = configparser.ConfigParser()
 
-        # Define the options values
+        # Define the options values to save
         config['symSettings'] = {
             'Mode': self.mode_options[self.mode],
             'Map_dimension': self.map_options[self.map_dim],
@@ -312,17 +314,18 @@ class SimulationMenu(Menu):
             'Prefab': self.prefab_options[self.prefab]
         }
 
-        # Create or overwrite the file
+        # Create or overwrite the configuration file
         with open(config_path, 'w') if os.path.isfile(config_path) else open(config_path, 'a') as configfile:
             config.write(configfile)
 
-    # Return the chosen map dimension
+    # Return the chosen map dimension and settings for the simulation
     def get_sim_settings(self):
         match self.map_dim:
             case 0: map_dim = 'SMALL'
             case 1: map_dim = 'MEDIUM'
             case 2: map_dim = 'BIG'
         
+        # Return the current simulation settings as a list
         settings = [self.mode,
                     map_dim,
                     int(self.seed_input),
@@ -331,7 +334,7 @@ class SimulationMenu(Menu):
         
         return settings
 
-    # Set the seed
+    # Set the seed based on the chosen map dimension
     def set_seed_input(self):
         match self.map_dim:
             case 0: self.seed_input = str(Assets.seed[0])
@@ -340,7 +343,7 @@ class SimulationMenu(Menu):
         
         self.set_input_cursor_pos()
 
-    # Update the position of the Seed cursor
+    # Update the position of the Seed input cursor
     def set_input_cursor_pos(self):
         self.input_cursor_x = self.align_right + self.input_cursor_offset*len(self.seed_input)
         self.input_cursor_y = self.states_y[2] + 15

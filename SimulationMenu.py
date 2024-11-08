@@ -17,13 +17,12 @@ class SimulationMenu(Menu):
         # Initialize the possible options for the menu
         self.mode_options   = Assets.mode_options
         self.map_options    = Assets.map_options
-        self.scan_options   = Assets.scan_options
+        self.prefab_options = Assets.prefab_options
 
-        # Initialize variables for selected options
-        self.mode      = 0
-        self.map_dim   = 0
-        self.n_drones  = 1
-        self.scan_mode = 0
+        self.mode     = 0
+        self.map_dim  = 0
+        self.n_drones = 3
+        self.prefab   = 1
        
         # Define positions for menu text alignment
         self.align_left      = self.mid_w - 50
@@ -36,7 +35,7 @@ class SimulationMenu(Menu):
                          self.mid_h -  50,  # Map Dimension
                          self.mid_h -  10,  # Seed
                          self.mid_h +  30,  # Drones
-                         self.mid_h +  70,  # Scan Mode
+                         self.mid_h +  70,  # Prefab
                          self.mid_h + 120,  # Back
                          self.mid_h + 220]  # Start Simulation
         
@@ -48,7 +47,7 @@ class SimulationMenu(Menu):
                          self.align_left - 310 + self.cursor_offset,  # Map Dimension
                          self.align_left -  95 + self.cursor_offset,  # Seed
                          self.align_left - 145 + self.cursor_offset,  # Drones
-                         self.align_left - 220 + self.cursor_offset,  # Scan Mode
+                         self.align_left - 145 + self.cursor_offset,  # Prefab
                          self.mid_w      -  45 + self.cursor_offset,  # Back
                          -100]                                        # Start Simulation
         self.cursor_y = [self.states_y[0],  # Mode
@@ -119,7 +118,7 @@ class SimulationMenu(Menu):
                            Assets.Fonts['SMALL'].value,
                            Assets.Colors['WHITE'].value,
                            Assets.RectHandle['MIDRIGHT'].value)
-            self.draw_text('Scan Mode', 25,
+            self.draw_text('Prefab', 25,
                            self.states_x[4],
                            self.states_y[4],
                            Assets.Fonts['SMALL'].value,
@@ -173,7 +172,7 @@ class SimulationMenu(Menu):
                            Assets.Fonts['SMALL'].value,
                            Assets.Colors['GREENDARK'].value,
                            Assets.RectHandle['MIDLEFT'].value)
-            self.draw_text(f'{self.scan_options[self.scan_mode]}', 25,
+            self.draw_text(f'{self.prefab_options[self.prefab]}', 25,
                            self.align_right,
                            self.states_y[4],
                            Assets.Fonts['SMALL'].value,
@@ -258,15 +257,17 @@ class SimulationMenu(Menu):
                         self.state = self.states[-1]
                 case 'Drones':
                     match self.n_drones:
-                        case 6:
-                            self.n_drones = 1
+                        case 8:
+                            self.n_drones = 2
                         case _:
-                            self.n_drones += 1
+                            self.n_drones += 2
                     return
-                case 'Scan Mode':
-                    self.scan_mode = 1 if self.scan_mode == 0 else 0
+                case 'Prefab':
+                    self.prefab = 1 if self.prefab == 0 else 0
+                    self.set_seed_input()
+                    self.game.blit_screen()
                     return
-        
+
         # Handle seed input
         self.set_seed()
     
@@ -310,7 +311,7 @@ class SimulationMenu(Menu):
             'Map_dimension': self.map_options[self.map_dim],
             'Seed': self.seed_input,
             'Drones': self.n_drones,
-            'Scan Mode': self.scan_options[self.scan_mode]
+            'Prefab': self.prefab_options[self.prefab]
         }
 
         # Create or overwrite the configuration file
@@ -329,7 +330,7 @@ class SimulationMenu(Menu):
                     map_dim,
                     int(self.seed_input),
                     self.n_drones,
-                    self.scan_mode]
+                    self.prefab]
         
         return settings
 

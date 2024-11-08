@@ -9,12 +9,11 @@ from Assets import sqr, next_cell_coords
 from multiprocessing import Process
 
 class MapGenerator():
-    def __init__(self, game, prefab=False):
-        # Initialize the MapGenerator with game settings and dimensions
+    def __init__(self, game):
         self.game     = game
         self.settings = game.sim_settings
         self.surface  = game.display
-        self.width    = Assets.FULLSCREEN_W
+        self.width    = Assets.FULLSCREEN_W - Assets.LEGEND_WIDTH
         self.height   = Assets.FULLSCREEN_H
         
         # Set the random seed for reproducibility
@@ -28,10 +27,10 @@ class MapGenerator():
         self.border_thck  = 50 # Thickness of the borders to control worm movement
         self.set_starts()  # Set the starting positions of the worms
 
-        if not prefab:
-            # If not generating from a prefab, create a new map and simulate worm behavior
-            self.bin_map = np.ones([self.height,self.width]) # Create a binary map initialized to 1s
-            self.dig_map(self.proc_num) # Generate the map using worms
+        if not self.settings[4]:
+            # Initialise the map and generate worms to eat it simultaneously
+            self.bin_map = np.ones([self.height,self.width])
+            self.dig_map(self.proc_num)
 
             # Perform image processing on the generated map
             self.process_map()
@@ -105,23 +104,24 @@ class MapGenerator():
 
     # Set starting positions for the worms
     def set_starts(self):
-        self.worm_x = list(map(int, [self.width/4,              # Top Left
-                                     3*self.width/4,            # Top Right
-                                     3*self.width/4,            # Bottom Right
-                                     self.width/4,              # Bottom Left
-                                     self.width/2,              # Center
-                                     rand.randint(10,1190),     # Random
-                                     rand.randint(10,1190),     # Random
-                                     rand.randint(10,1190)]))   # Random
+        self.worm_x = list(map(int, [self.width/4,      # Top Left
+                                     3*self.width/4,    # Top Right
+                                     3*self.width/4,    # Bottom Right
+                                     self.width/4,      # Bottom Left
+                                     self.width/2,      # Center
+                                     rand.randint(self.border_thck, self.width - self.border_thck),
+                                     rand.randint(self.border_thck, self.width - self.border_thck),
+                                     rand.randint(self.border_thck, self.width - self.border_thck)]))
         
-        self.worm_y = list(map(int, [self.height/4,             # Top Left
-                                     self.height/4,             # Top Right
-                                     3*self.height/4,           # Bottom Right
-                                     3*self.height/4,           # Bottom Left
-                                     self.height/2,             # Center
-                                     rand.randint(10,740),      # Random
-                                     rand.randint(10,740),      # Random
-                                     rand.randint(10,740)]))    # Random
+        self.worm_y = list(map(int, [self.height/4,     # Top Left
+                                     self.height/4,     # Top Right
+                                     3*self.height/4,   # Bottom Right
+                                     3*self.height/4,   # Bottom Left
+                                     self.height/2,     # Center
+                                     # Random
+                                     rand.randint(self.border_thck, self.height - self.border_thck),
+                                     rand.randint(self.border_thck, self.height - self.border_thck),
+                                     rand.randint(self.border_thck, self.height - self.border_thck)]))
 
     # Avoid collision with the window borders
     def border_control(self, x1, x2, y1, y2, stren, new_dir=True):
@@ -262,7 +262,7 @@ class MapGenerator():
     #  \____||_____||_____|/_/   \_\|_| \_||___||_| \_| \____|
 
     # Remove isolated caves
-    def remove_hermit_caves(self,image):
+    def remove_hermit_caves(self, image):
         # Create a binary mask by inverting the image
         inverted_image = np.where(image == 0, 1, 0).astype('uint8')
         # Find connected components with statistics in the inverted image
@@ -284,6 +284,37 @@ class MapGenerator():
         cleaned_image = np.where(mask_to_keep, image, 1) # Keep the largest region, clear others
 
         return cleaned_image
+    
+    # Change the color of all the pixels within a frame of thickness self.border_thck to BLACK
+    def add_frame(self, image):
+        for i in range(0, self.width):
+            for j in range(0, self.height):
+                if (image[j][i]==0 and (i < self.border_thck or i > self.width - self.border_thck or
+                                        j < self.border_thck or j > self.width - self.border_thck)):
+                    image[j][i] = 1
+
+        return self.mask_frame(image)
+    
+    # Add stalactites randomly along the frame (only in white areas within [0:7] pixels from the border)
+    def mask_frame(self, image):
+        # Define the random generator
+        rng = np.random.default_rng(seed=self.settings[2])
+
+        # Define how far into the map the stalactites are added
+        # (Randomly between 0 and 7 changing value every 10 pixels)
+        mask_h = np.repeat(rng.choice([0,1,2,3,4,5,6,7], size=math.ceil(self.width/10)), 10)
+        mask_v = np.repeat(rng.choice([0,1,2,3,4,5,6,7], size=math.ceil(self.height/10)), 10)
+
+        # Apply the mask
+        for i in range(0, self.width):
+            for j in range(0, self.height):
+                if (image[j][i]==0 and ((i >= self.border_thck and i < self.border_thck + mask_h[i]) or
+                                        (i > self.width - self.border_thck - mask_h[i] and i <= self.width - self.border_thck) or
+                                        (j >= self.border_thck and j < self.border_thck + mask_v[j]) or
+                                        (j > self.height - self.border_thck - mask_v[j] and j <= self.height - self.border_thck))):
+                    image[j][i] = rng.choice([0,1], p=[0.4,0.6])
+        
+        return image
 
 
     #  ____    ___   ____   _____         ____   ____    ___    ____  _____  ____   ____   ___  _   _   ____ 
@@ -312,6 +343,10 @@ class MapGenerator():
         # Apply a smaller median blur to avoid creating single pixel stalactites
         kernel_dim = 5
         self.bin_map = cv2.medianBlur(stalac_map, kernel_dim)  # Update the binary map
+
+        # Add black frame in case worms were too greedy
+        # (Should not happen, but let's keep it)
+        #self.bin_map = self.add_frame(self.bin_map)
 
     def extract_cave_walls(self):
         # Load the cave map image

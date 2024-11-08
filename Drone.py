@@ -8,43 +8,43 @@ from AStar import AStar
 
 
 class Drone():
-    def __init__(self, game, manager, id, start_pos, color, icon, cave):
-        
-        # Initialize the drone with game, position, color, and strategy details
-        self.game         = game
-        self.settings     = game.sim_settings
-        self.cave         = cave
-        self.manager      = manager
+    def __init__(self, game, control, id, start_pos, color, icon, cave, strategy="random"):
+        self.game     = game
+        self.settings = game.sim_settings
+        self.cave     = cave
+        self.control  = control
+        self.strategy = strategy
          
-        self.id           = id # Unique identifier of the drone
-        self.map_size     = self.settings[1] # Map dimension
-        self.radius       = self.calculate_radius() # Field of view radius, calculated based on map size
-        self.step         = 10 # Drone movement step size
-        self.dir          = rand.randint(0,359) # Drone's current direction 
+        self.id       = id # Unique identifier of the drone
+        self.map_size = self.settings[1] # Map dimension
+        self.radius   = self.calculate_radius() # Radius that represent the field of view # 39
+        self.step     = 10 # Step of the drone
+        self.dir      = rand.randint(0,359)
 
-        self.color        = color
-        self.alpha        = 150
-        self.icon         = icon
+        self.color = color
+        self.alpha = 150
+        self.icon  = icon
+
+        self.battery  = 100
+        self.statuses = ['Ready', 'Deployed', 'Sharing', 'Homing', 'Charging', 'Done']
         
         self.explored = False # Flag to track if the exploration has started
         
         # Transparent surface used to track the explored path
-        self.floor_surf   = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
+        self.floor_surf = pygame.Surface((self.game.width,self.game.height), pygame.SRCALPHA)
         self.floor_surf.fill((*Colors.WHITE.value, 0))
-        self.ray_points   = [] # List for storing sensor ray points
-        self.delay        = self.manager.delay
+        self.ray_points = []  # Initialize the list for rays
+        self.delay      = self.control.delay
 
-        # Path visualization settings
-        self.show_path       = True
-        self.speed_factor    = 4
-        
+        self.show_path    = True
+        self.speed_factor = 4
          
-        self.border       = []
-        self.start_pos    = start_pos
-        self.pos          = start_pos
-        self.dir_log      = []
-        self.graph        = Graph(*start_pos, cave)
-        self.astar        = AStar(self.floor_surf, cave, self.color, self.game)
+        self.border    = []
+        self.start_pos = start_pos
+        self.pos       = start_pos
+        self.dir_log   = []
+        self.graph     = Graph(*start_pos, cave)
+        self.astar     = AStar(self.floor_surf, cave, self.color, self.game)
 
     # Define the radius based on the map size
     def calculate_radius(self):

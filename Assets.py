@@ -20,16 +20,18 @@ DISPLAY_W    = 1200
 DISPLAY_H    = 750
 FULLSCREEN_W = 1915 #root.winfo_screenwidth() - 5
 FULLSCREEN_H = 1010 #root.winfo_screenheight() - 70
+LEGEND_WIDTH = 300
 
 # Lists for menu voices and settings
 main_menu_states    = ['Start', 'Options', 'Credits', 'Exit']
 options_menu_states = ['Game Volume', 'Music Volume', 'Button Sound', 'Back']
-sim_menu_states     = ['Mode', 'Map Dimension', 'Seed', 'Drones', 'Scan Mode', 'Back', 'Start Simulation']
+sim_menu_states     = ['Mode', 'Map Dimension', 'Seed', 'Drones', 'Prefab', 'Back', 'Start Simulation']
 mode_options        = ["Cave exploration", "Rescue mission"]
-scan_options        = ['Radar', 'Lidar']
 map_options         = ["Small", "Medium", "Big"]
+prefab_options      = ['No', 'Yes']
 vision_options      = [     39,       19,     4]
 drone_icon_options  = [(30,30),  (10,10), (1,1)]
+rover_icon_options  = [(40,40),  (15,15), (5,5)]
 seed                = [      5,       19,   837]
 
 # Map Generator Inputs
@@ -60,14 +62,19 @@ class Colors(Enum):
         BLUE         = (  0,   0, 153)
 
 class DroneColors(Enum):
-        PINK         = (255,  51, 153)
-        VIOLET       = (153,  51, 255)
-        BLUE         = (  0,   0, 153)
-        L_BLUE       = ( 51, 255, 255)
-        GREEN        = ( 51, 255,  51)
-        ORANGE       = (255, 128,   0)
-        RED          = (255,   0,   0)
-        BROWN        = (165,  42,  42)
+        RED          = (255,   0,   0)   # Blinky
+        PINK         = (255, 184, 255)   # Pinky
+        L_BLUE       = (  0, 255, 255)   # Inky
+        ORANGE       = (255, 184,  82)   # Clyde
+        PURPLE       = (148,   0, 221)   # Sue
+        BROWN        = (160,  82,  45)   # Tim
+        GREEN        = ( 34, 139,  34)   # Funky
+        GOLD         = (255, 215,   0)   # Kinky
+
+class RoverColors(Enum):
+        RED          = (220,   0,   0)   # Huey
+        BLUE         = (  0,   0, 255)   # Dewey
+        GREEN        = (  0, 128,   0)   # Louie
         
 class Fonts(Enum):
         BIG          = os.path.join(GAME_DIR, 'Assets', 'Fonts', 'Cave-Stone.ttf')  
